@@ -3,6 +3,9 @@
 source "$SRC_HOME/src/shared-functions.sh"
 source "$SRC_HOME/.env"
 
+DEFAULT_FORMAT='-column' # do sqlite .mode xxx to find all accepted formats
+HEADER='-header' #-[no]header
+
 print_guidance() {
 	echo 'coinmaster:
     cli > starts sqlite3 shell
@@ -60,5 +63,5 @@ start_sqlite3() {
     echo -e "SELECT FROM THE FOLLOWING:"
     sqlite3 "$coinmaster_location" .tables
     echo ''
-    sqlite3 "$coinmaster_location" -box
+    sqlite3 "$coinmaster_location" $HEADER $DEFAULT_FORMAT
 }
