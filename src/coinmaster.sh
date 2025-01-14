@@ -5,6 +5,7 @@ source "$SRC_HOME/.env"
 
 DEFAULT_FORMAT='-column' # do sqlite .mode xxx to find all accepted formats
 HEADER='-header' #-[no]header
+LESS='--RAW-CONTROL-CHARS --chop-long-lines --shift=4 --quit-if-one-screen --no-init --tilde --LONG-PROMPT'
 
 print_guidance() {
 	echo 'coinmaster:
@@ -28,10 +29,17 @@ main() {
         tx | transac*) shift ; "$transactions_manager" "$@" ;;
         xp | *xpen*  ) shift ; "$expenses_manager" "$@" ;;
         dump | backup) dump_database ;;
+        pending) execute_query "$pending_transactions" ;;
         *) echo 'nothing happened...' ;;
 
     esac
 
+}
+
+execute_query() {
+    tmp=$(mktemp)
+    sqlite3 "$coinmaster_location" '.headers on' '.mode tab' "$1" > $tmp
+    tabcat $tmp
 }
 
 #FIXME:
