@@ -14,7 +14,7 @@ print_guidance() {
     connect > invoke connection  manager
     transac > invoke transaction manager
     expense > invoke expenses manager
-    new transac > inserts a transaction in coinmaster
+    new transac | log > inserts a transaction in coinmaster
     dump > dump database'
 }
 
@@ -26,6 +26,7 @@ main() {
         cli | start) start_sqlite3 ;;
         gui | open) open_sqlitebrowser ;;
         new) shift ; route_new "$@" ;;
+        log) "$transactions_manager" --new ;;
         tx | transac*) shift ; "$transactions_manager" "$@" ;;
         xp | *xpen*  ) shift ; "$expenses_manager" "$@" ;;
         dump | backup) dump_database ;;
