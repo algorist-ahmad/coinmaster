@@ -1,0 +1,55 @@
+Usage: coin                                  Runs default program as defined in config.yml (lists bills by default)
+       coin          --help, -h              Outputs help.txt in a pager
+       coin          help                    Alias to '--help'
+       coin          add  <mods>             Adds a new bill
+       coin <filter> mod  <mods>             Modifies the existing bill with provided arguments.
+       coin <filter> set  <mods>             Alias to 'modify'
+       coin <filter> edit <mods>             Deletes the specified task
+       task <filter> del  <mods>                            Deletes the specified task
+
+       task <filter> all                                      All tasks
+       task <filter> annotate <mods>                          Adds an annotation to an existing task
+       task <filter> append <mods>                            Appends text to an existing task description
+       task          calc <expression>                        Calculator
+       task          calendar [due|<month> <year>|<year>] [y] Shows a calendar, with due tasks marked
+       task          colors [sample | legend]                 All colors, a sample, or a legend
+       task          columns [substring]                      All supported columns and formatting styles
+       task          commands                                 Generates a list of all commands, with behavior details
+       task <filter> completed                                Completed tasks
+       task          config [name [value | '']]               Change settings in the task configuration
+       task <filter> count                                    Counts matching tasks
+       task <filter> denotate <pattern>                       Deletes an annotation
+       task          diagnostics                              Platform, build and environment details
+       task <filter> done <mods>                              Marks the specified task as completed
+       task <filter> duplicate <mods>                         Duplicates the specified tasks
+       task <filter> edit                                     Launches an editor to modify a task directly
+       task          execute <external command>               Executes external commands and scripts
+       task <filter> export [<report>]                        Exports tasks in JSON format
+       task <filter> ghistory                          Shows a graphical report of task history
+       task <filter> history                           Shows a report of task history
+       task <filter> last_insert                              Reports all info on last inserted task
+       task <filter> list                                     Most details of tasks
+       task          log <mods>                               Adds a new task that is already completed
+       task          logo                                     Displays the CoinMaster logo
+       task <filter> long                                     All details of tasks
+       task <filter> ls                                       Few details of tasks
+       task <filter> minimal                                  Minimal details of tasks
+       task <filter> newest                                   Newest tasks
+       task <filter> next                                     Most urgent tasks
+       task <filter> oldest                                   Oldest tasks
+       task <filter> overdue                                  Overdue tasks
+       task <filter> recurring                                Recurring Tasks
+       task          reports                                  Lists all supported reports
+       task          show [all | substring]                   Shows all configuration variables or subset
+       task <filter> summary                                  Shows a report of task status by project
+       task          undo                                     Reverts the most recent change to a task
+       task <filter> waiting                                  Waiting (hidden) tasks
+       task          _get <DOM> [<DOM> ...]                   DOM Accessor
+       task <filter> _ids                                     Shows the IDs of matching tasks, in the form of a list
+       task <filter> _projects                                Shows only a list of all project names used
+       task          _show                                    Shows all configuration settings in a machine-readable format
+       task <filter> _tags                                    Shows only a list of all tags used, for autocompletion purposes
+       task          _udas                                    Shows the defined UDAs for completion purposes
+       task <filter> _unique <attribute>                      Generates lists of unique attribute values
+       task <filter> _urgency                                 Displays the urgency measure of a task
+       task <filter> _uuids                                   Shows the UUIDs of matching tasks, as a list
