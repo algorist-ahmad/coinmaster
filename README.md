@@ -12,10 +12,17 @@ bills on time and ensure that I'm not going into debt (Income vs expense).
 
 ### TODO
 
-- [ ] `--help` option
-- [x] Add style to help.txt similarly to github.com/algorist-ahmad/parse/help.txt
-- [ ] Listing and persisting bills (use taskwarrior)
-- [ ] Must be able to answer the questions such as: 'am I going into debt?' or 'can I afford it this week?'
-- [ ] Must be able to create tasks and add them to my task database
+**NEXT**: configure cfg/.taskrc
+
+- [x] add `--help` option
+- [x] add style to help.txt
+- [x] list bills
+- [x] executing task
+- [ ] ready .taskrc
+- [ ] import data from old coin.db
+- [ ] must be able to send/create email reminders (create email file to pipe/send to sendmail)
+- [ ] must be able to export tasks
+- [ ] must be able to export reminders (REM syntax)
+- [ ] must be able to answer the questions such as: 'am I going into debt?' or 'can I afford it this week?'
 
 ##
