@@ -1,0 +1,8 @@
+Here are some things to test for bin/coin
+
+ 1998  bin/coin
+ 1999  bin/coin help
+ 2000  bin/coin help ver
+ 2001  bin/coin ver
+ 2002  bin/coin list
+ 2003  bin/coin nonsense

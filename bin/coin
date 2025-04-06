@@ -1,176 +1,61 @@
 #!/bin/bash
 
-# set environment variables, parse input, and dispatch to correct function
+VERSION='0.1.0'
 
+# Entry point to my program. Loads config.yml then routes to the appropriate subprogram as instrcuted
+# from the first argument.
 
+# TESTS: PASSED but undocumented
 
-declare -A NAMESPACE=(
-    [args]="$@"
-    [debug]=0
-    ## mututally exclusive
-    [select]=1 # TRUE by default
-    [create]=0
-    [edit]=0
-    [delete]=0
-    ## *****************
-    [uuid]=''
-    [name]=''
-    [dir]=0
-)
+# FIXME:
+# [ ] No error handling for missing or nonesense config.yml
+# [ ] No validation of yq output in config_get
+
+# TODO:
+# [ ] Add config file validation
+# [ ] Implement proper argument parsing
+# [ ] Add logging functionality
+
+ROOT_DIR=$( dirname "$(dirname "$(readlink -f "$0")")" )
+CONFIGFILE="$ROOT_DIR/config.yml"
+HELPFILE="$ROOT_DIR/help.txt"
+ARGS="$@"
+CMD_LIST="$ROOT_DIR/src/list.sh"
+DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
-    initialize   # setup environment and check for missing files
-    dissect "$@" # break input for analysis
-    validate     # validate the operation
-    dispatch     # execute the operation
-    terminate    # execute post-script tasks regardless of operation
+  load_config_file
+  dispatch $ARGS
 }
 
-initialize() {
-    # echo "Setting up environment"
-    # echo "Checking for missing variables or files"
-    FLAG[error]=0
-}
-
-dissect() {
-
-    LAST_OPTION=''
-    
-    # Iterate over arguments using a while loop
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            debug | --debug)
-                NAMESPACE[debug]=1 ;
-                ;;
-            list | ls | '')
-                NAMESPACE[select]=1 ;
-                ;;                
-            new | add | +*)
-                NAMESPACE[create]=1 ;
-                NAMESPACE[select]=0 ;
-                ;;
-            edit | open | mod)
-                NAMESPACE[edit]=1 ;
-                NAMESPACE[select]=0 ;
-                ;;
-            del* | rm | -*)
-                NAMESPACE[delete]=1 ;
-                NAMESPACE[select]=0 ;
-                ;;
-            dir)
-                NAMESPACE[dir]=1 ;
-                NAMESPACE[select]=0 ;
-                ;;
-            *)
-                uuid_or_filename "$1" ;
-                ;;
-        esac
-        # discard argument
-        shift
-    done
-}
-
-validate() {
-    check_for_contradiction
-    # check_for_error2
-    # check_for_error3
-    # ...
-}
-
-check_for_contradiction() {
-    local count=0
-    for key in select create edit delete; do
-        if [[ "${NAMESPACE[$key]}" -eq 1 ]]; then
-            ((count++))
-        fi
-    done
-
-    if [[ $count -gt 1 ]]; then FLAG[error]=11; fi
+# load config from config.yml
+load_config_file() {
+  DEFAULT_FN=$(config_get 'default_command')
 }
 
 dispatch() {
-
-    if [[ "${FLAG[error]:-0}" -gt 0 ]]; then
-        echo "Error: ${ERROR[${FLAG[error]}]}" >&2
-        exit "${FLAG[error]}"
-    fi
-
-    [[ "${NAMESPACE[select]}" -eq 1 ]] && do_select
-    [[ "${NAMESPACE[create]}" -eq 1 ]] && do_create
-    [[ "${NAMESPACE[edit]}"   -eq 1 ]] && do_edit
-    [[ "${NAMESPACE[delete]}" -eq 1 ]] && do_delete
-    [[ "${NAMESPACE[dir]}"    -eq 1 ]] && print_dir
+  case "$1" in
+  
+    help | --help | -h)    shift ; show_help    ;;
+    ver* | --version | -v) shift ; show_version ;;
+    list | ls | -l)        shift ; do_list "$@" ;;
     
-    # ...else
-    #     echo "Error: No valid operation specified." >&2
-    #     exit 1
-    # fi
+    '') dispatch "$DEFAULT_FN"  ;;
+    * ) handle_unknown_arg "$1" ;;
+    
+  esac
 }
 
-terminate() {
-    reveal_variables
-    help_if_no_arg
+config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
+
+do_list() { "$CMD_LIST" "$@" ; }
+
+show_help() { echo -e "$(cat $HELPFILE)" | less ; }
+show_version() { echo -e "coin $VERSION" ; }
+
+handle_unknown_arg() {
+  >&2 echo "Unknown subcommand: $1"
+  exit 11
 }
 
-print_dir() {
-    echo "${FILES[data]}" | xclip -selection clipboard
-    echo "${FILES[data]}"
-    echo "(copied)"
-}
-
-list_if_no_arg() {
-     [[ "${NAMESPACE[args]}" == "" ]] && NAMESPACE[select]=1
-}
-
-help_if_no_arg() {
-    [[ "${NAMESPACE[args]}" == "" ]] && echo 'Usage: sheet [new | mod | del] [UUID | FILENAME]' && exit 0
-}
-
-reveal_variables() {
-    if [[ NAMESPACE['debug'] -eq 1 ]]; then
-        # Loop through the keys of the associative array and print key-value pairs
-        echo -e "\nDEBUG:"
-        for key in "${!NAMESPACE[@]}"; do
-            echo "Key: $key, Value: ${NAMESPACE[$key]}"
-        done
-    fi
-}
-
-uuid_or_filename() {
-    echo "uuid or filename? $1"
-}
-
-do_select() {
-    local uuids="${NAMESPACE[uuid]}"
-    local names="${NAMESPACE[name]}"
-    local select_all=$([[ -z "$uuids" && -z "$names" ]] && echo 'true' || echo 'false')
-
-    if [[ $select_all == "true" ]]; then
-        list_all_files
-    else
-        list_files_by_uuid $uuids
-        list_files_by_name $names
-    fi
-}
-
-list_all_files() {
-    echo "listing all"
-}
-
-list_files_by_uuid() {
-    echo "$@"
-}
-
-do_create() {
-    echo "new spreadsheet!"
-}
-
-do_edit() {
-    echo "opening in sc-im..."
-}
-
-do_delete() {
-    echo "removing file..."
-}
-
-main "$@"
+main

@@ -1,55 +1,53 @@
-Usage: coin                                  Runs default program as defined in config.yml (lists bills by default)
-       coin          --help, -h              Outputs help.txt in a pager
-       coin          help                    Alias to '--help'
-       coin          add  <mods>             Adds a new bill
-       coin <filter> mod  <mods>             Modifies the existing bill with provided arguments.
-       coin <filter> set  <mods>             Alias to 'modify'
-       coin <filter> edit <mods>             Deletes the specified task
-       task <filter> del  <mods>                            Deletes the specified task
+\e[1mCOIN\e[0m - Bill Management CLI
 
-       task <filter> all                                      All tasks
-       task <filter> annotate <mods>                          Adds an annotation to an existing task
-       task <filter> append <mods>                            Appends text to an existing task description
-       task          calc <expression>                        Calculator
-       task          calendar [due|<month> <year>|<year>] [y] Shows a calendar, with due tasks marked
-       task          colors [sample | legend]                 All colors, a sample, or a legend
-       task          columns [substring]                      All supported columns and formatting styles
-       task          commands                                 Generates a list of all commands, with behavior details
-       task <filter> completed                                Completed tasks
-       task          config [name [value | '']]               Change settings in the task configuration
-       task <filter> count                                    Counts matching tasks
-       task <filter> denotate <pattern>                       Deletes an annotation
-       task          diagnostics                              Platform, build and environment details
-       task <filter> done <mods>                              Marks the specified task as completed
-       task <filter> duplicate <mods>                         Duplicates the specified tasks
-       task <filter> edit                                     Launches an editor to modify a task directly
-       task          execute <external command>               Executes external commands and scripts
-       task <filter> export [<report>]                        Exports tasks in JSON format
-       task <filter> ghistory                          Shows a graphical report of task history
-       task <filter> history                           Shows a report of task history
-       task <filter> last_insert                              Reports all info on last inserted task
-       task <filter> list                                     Most details of tasks
-       task          log <mods>                               Adds a new task that is already completed
-       task          logo                                     Displays the CoinMaster logo
-       task <filter> long                                     All details of tasks
-       task <filter> ls                                       Few details of tasks
-       task <filter> minimal                                  Minimal details of tasks
-       task <filter> newest                                   Newest tasks
-       task <filter> next                                     Most urgent tasks
-       task <filter> oldest                                   Oldest tasks
-       task <filter> overdue                                  Overdue tasks
-       task <filter> recurring                                Recurring Tasks
-       task          reports                                  Lists all supported reports
-       task          show [all | substring]                   Shows all configuration variables or subset
-       task <filter> summary                                  Shows a report of task status by project
-       task          undo                                     Reverts the most recent change to a task
-       task <filter> waiting                                  Waiting (hidden) tasks
-       task          _get <DOM> [<DOM> ...]                   DOM Accessor
-       task <filter> _ids                                     Shows the IDs of matching tasks, in the form of a list
-       task <filter> _projects                                Shows only a list of all project names used
-       task          _show                                    Shows all configuration settings in a machine-readable format
-       task <filter> _tags                                    Shows only a list of all tags used, for autocompletion purposes
-       task          _udas                                    Shows the defined UDAs for completion purposes
-       task <filter> _unique <attribute>                      Generates lists of unique attribute values
-       task <filter> _urgency                                 Displays the urgency measure of a task
-       task <filter> _uuids                                   Shows the UUIDs of matching tasks, as a list
+\e[1mUSAGE\e[0m
+  \e[32mcoin\e[0m [\e[36mFILTER\e[0m] [\e[32mSUBCOMMAND\e[0m] [\e[33mMODS\e[0m]  # TaskWarrior-style
+  \e[32mcoin\e[0m \e[32m[SUBCOMMAND]\e[0m \e[33m[OPTIONS]\e[0m \e[36m[ARGS]\e[0m  # Native-style
+
+\e[1mNATIVE SUBCOMMANDS\e[0m
+  \e[32mhelp\e[0m      Show this message
+  \e[32mversion\e[0m   Print version number
+  \e[32mlist\e[0m      Show upcoming bills (default)
+  \e[32madd\e[0m       NOT IMPLEMENTED
+  \e[32mpay\e[0m       NOT IMPLEMENTED
+  \e[32mparse\e[0m     NOT IMPLEMENTED
+  \e[32mconfig\e[0m    NOT IMPLEMENTED 
+
+\e[1mTASKWARRIOR COMMANDS\e[0m
+  \e[35mmodify\e[0m    Edit existing bill
+  \e[35mexport\e[0m    Generate bill reports
+  \e[35mstats\e[0m     Financial overview
+  \e[35mundo\e[0m      Reverse last action
+
+\e[1mOPTIONS\e[0m NOT IMPLEMENTED
+  \e[33m--currency\e[0m=CURR   Set display currency
+  \e[33m--template\e[0m=NAME  Use bill template
+  \e[33m-v, --verbose\e[0m    Show payment details
+  \e[33m-q, --quiet\e[0m      Minimal output
+
+\e[1mEXAMPLES\e[0m
+  \e[36m# Default bill listing\e[0m
+  \e[32mcoin\e[0m
+
+  \e[36m# Add electricity bill\e[0m
+  \e[32mcoin add\e[0m \e[33m--template=utility\e[0m \e[36m"Electric Co." amount:85 due:2023-08-15\e[0m
+
+  \e[36m# TaskWarrior-style payment\e[0m
+  \e[32mcoin\e[0m \e[36m+BILL\e[0m \e[35mpay\e[0m \e[33mdate:today\e[0m
+
+  \e[36m# Modify existing bill\e[0m
+  \e[32mcoin\e[0m \e[36mid:15\e[0m \e[35mmodify\e[0m \e[33mdue:+1w\e[0m
+
+\e[1mCONFIGURATION\e[0m
+  Default command: \e[33m~/.config/coin.yml\e[0m
+  Set default currency, templates, and bill categories:
+  \e[33mdefaults:\e[0m
+    \e[33mcommand: list +BILL -PAID\e[0m
+    \e[33mcurrency: USD\e[0m
+    \e[33mreminder_days: 3\e[0m
+
+\e[1mTIP\e[0m
+  Override defaults temporarily: 
+  \e[32mcoin\e[0m \e[33m--currency=EUR\e[0m \e[35mlist\e[0m
+  Access full TaskWarrior commands: 
+  \e[32mcoin\e[0m \e[35mhelp task\e[0m

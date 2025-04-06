@@ -12,9 +12,10 @@ bills on time and ensure that I'm not going into debt (Income vs expense).
 
 ### TODO
 
+- [ ] `--help` option
+- [x] Add style to help.txt similarly to github.com/algorist-ahmad/parse/help.txt
 - [ ] Listing and persisting bills (use taskwarrior)
 - [ ] Must be able to answer the questions such as: 'am I going into debt?' or 'can I afford it this week?'
 - [ ] Must be able to create tasks and add them to my task database
-- [ ] `--help` option
 
 ##

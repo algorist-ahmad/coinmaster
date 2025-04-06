@@ -1,2 +1,2 @@
-default: list
+default_command: list # default subcommand and its arguments
 database: $NEXUS/coin/coin.db
