@@ -21,6 +21,7 @@ CONFIGFILE="$ROOT_DIR/config.yml"
 HELPFILE="$ROOT_DIR/help.txt"
 ARGS="$@"
 CMD_LIST="$ROOT_DIR/src/list.sh"
+CMD_TASK="$ROOT_DIR/src/task.sh"
 DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
@@ -41,7 +42,7 @@ dispatch() {
     list | ls | -l)        shift ; do_list "$@" ;;
     
     '') dispatch "$DEFAULT_FN"  ;;
-    * ) handle_unknown_arg "$1" ;;
+    * ) do_task "$ARGS" ;;
     
   esac
 }
@@ -49,13 +50,14 @@ dispatch() {
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
 
 do_list() { "$CMD_LIST" "$@" ; }
+do_task() { "$CMD_TASK" "$@" ; }
 
 show_help() { echo -e "$(cat $HELPFILE)" | less ; }
 show_version() { echo -e "coin $VERSION" ; }
 
-handle_unknown_arg() {
-  >&2 echo "Unknown subcommand: $1"
-  exit 11
-}
+# handle_unknown_args() {
+#   >&2 echo "PASSING TO COMMAND: list.sh"
+#   do_list $ARGS
+# }
 
 main

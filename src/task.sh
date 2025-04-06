@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# TODO DESC
+# Execute task commands as they areon behalf of coinmaster
 
 # TESTS: FAIL
 
@@ -11,6 +11,9 @@
 # [ ] 
 
 ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
+
+source "$ROOT/src/load-config.sh"
+
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"
 COINRC="$ROOT/cfg/.taskrc"
@@ -20,25 +23,14 @@ main() {
   load_config
   check_rc_file_exists
   check_data_file_exists
-  run_task
-}
-
-load_config() {
-  echo "list.sh: LOADING CONFIG (sim)"
-}
-
-check_rc_file_exists() {
-  echo "checking rc file exists"
-}
-
-check_data_file_exists() {
-  echo "checking data file exists"
+  run_task $ARGS
 }
 
 run_task() {
   TASKRC="$COINRC"
   TASKDATA="$COINDATA"
-  task all
+  echo "EXECUTING TASK AS IS: $@"
+  task $@
 }
 
 main
