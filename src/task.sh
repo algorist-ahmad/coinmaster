@@ -29,7 +29,7 @@ main() {
 run_task() {
   TASKRC="$COINRC"
   TASKDATA="$COINDATA"
-  echo "EXECUTING TASK AS IS: $@"
+  >&2 echo "EXECUTING TASK AS IS: $@"
   task $@
 }
 
