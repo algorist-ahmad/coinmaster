@@ -21,15 +21,14 @@ COINDATA="$COINDATA"
 
 main() {
   load_config
-  check_rc_file_exists
-  check_data_file_exists
+  check_files
   run_task $ARGS
 }
 
 run_task() {
   TASKRC="$COINRC"
   TASKDATA="$COINDATA"
-  >&2 echo "EXECUTING TASK AS IS: $@"
+  # >&2 echo "executing \`task $@\`"
   task $@
 }
 

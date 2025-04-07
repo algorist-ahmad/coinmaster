@@ -22,6 +22,7 @@ HELPFILE="$ROOT_DIR/help.txt"
 ARGS="$@"
 CMD_LIST="$ROOT_DIR/src/list.sh"
 CMD_TASK="$ROOT_DIR/src/task.sh"
+CMD_INSERT="$ROOT_DIR/src/insert.sh"
 DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
@@ -40,6 +41,7 @@ dispatch() {
     help | --help | -h)    shift ; show_help    ;;
     ver* | --version | -v) shift ; show_version ;;
     list | ls | -l)        shift ; do_list "$@" ;;
+    add  | -a)             shift ; do_insert "$@" ;;
     
     '') dispatch "$DEFAULT_FN"  ;;
     * ) do_task "$ARGS" ;;
@@ -49,8 +51,9 @@ dispatch() {
 
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
 
-do_list() { "$CMD_LIST" "$@" ; }
-do_task() { "$CMD_TASK" "$@" ; }
+do_list()   { "$CMD_LIST" "$@" ; }
+do_task()   { "$CMD_TASK" "$@" ; }
+do_insert() { "$CMD_INSERT" "$@" ; }
 
 show_help() { echo -e "$(cat $HELPFILE)" | less ; }
 show_version() { echo -e "coin $VERSION" ; }
