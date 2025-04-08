@@ -41,7 +41,7 @@ dispatch() {
     help | --help | -h)    shift ; show_help    ;;
     ver* | --version | -v) shift ; show_version ;;
     list | ls | -l)        shift ; do_list "$@" ;;
-    next | -n)             shift ; do_next "$@" ;;              # TODO
+    # next | -n)             shift ; do_next "$@" ;;              # TODO
     add  | -a)             shift ; do_insert "$@" ;;
     log  | -aa)            shift ; do_insert "SPECIALARGS"   ;; # undocumented TODO
     --generate-*mail)      shift ; do_generate_email "$@"    ;; # undocumented TODO
