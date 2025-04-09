@@ -16,8 +16,8 @@ source "$ROOT/src/load-config.sh"
 
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"
-COINRC="$ROOT/cfg/.taskrc"
-COINDATA="$COINDATA"
+TASKRC="$ROOT/cfg/.taskrc"
+TASKDATA="$COINDATA/tasks"
 
 main() {
   load_config
@@ -26,8 +26,6 @@ main() {
 }
 
 run_task() {
-  TASKRC="$COINRC"
-  TASKDATA="$COINDATA"
   # >&2 echo "executing \`task $@\`"
   task $@
 }

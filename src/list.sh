@@ -15,9 +15,8 @@ ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
 source "$ROOT/src/load-config.sh"
 
 ARGS="$@"
-CONFIGFILE="$ROOT/config.yml"
 TASKRC="$ROOT/cfg/.taskrc"
-TASKDATA="$COINDATA"
+TASKDATA="$COINDATA/tasks"
 
 main() {
   load_config

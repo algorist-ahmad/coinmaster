@@ -16,7 +16,7 @@ source "$ROOT/src/load-config.sh"
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"
 TASKRC="$ROOT/cfg/.taskrc"
-TASKDATA="$COINDATA"
+TASKDATA="$COINDATA/tasks"
 SUCCESS=0
 
 main() {
