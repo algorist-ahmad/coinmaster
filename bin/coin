@@ -23,6 +23,7 @@ ARGS="$@"
 CMD_LIST="$ROOT_DIR/src/list.sh"
 CMD_TASK="$ROOT_DIR/src/task.sh"
 CMD_INSERT="$ROOT_DIR/src/insert.sh"
+CMD_BALANCE="$ROOT_DIR/src/balance.sh"
 DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
@@ -44,6 +45,7 @@ dispatch() {
     # next | -n)             shift ; do_next "$@" ;;              # TODO
     add  | -a)             shift ; do_insert "$@" ;;
     log  | -aa)            shift ; do_insert "SPECIALARGS"   ;; # undocumented TODO
+    bal* | -b)             shift ; do_balance "$@"           ;; # undocumented TODO
     --generate-*mail)      shift ; do_generate_email "$@"    ;; # undocumented TODO
     --generate-task?)      shift ; do_generate_task "$@"     ;; # undocumented TODO
     --generate-cal*)       shift ; do_generate_calendar "$@" ;; # undocumented TODO
@@ -56,9 +58,10 @@ dispatch() {
 
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
 
-do_list()   { "$CMD_LIST" "$@" ; }
-do_task()   { "$CMD_TASK" "$@" ; }
-do_insert() { "$CMD_INSERT" "$@" ; }
+do_list()    { "$CMD_LIST" "$@" ; }
+do_task()    { "$CMD_TASK" "$@" ; }
+do_insert()  { "$CMD_INSERT" "$@" ; }
+do_balance() { "$CMD_BALANCE" "$@" ; }
 
 show_help() { echo -e "$(cat $HELPFILE)" | less ; }
 show_version() { echo -e "coin $VERSION" ; }
