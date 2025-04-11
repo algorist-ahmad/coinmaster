@@ -20,11 +20,15 @@ ROOT_DIR=$( dirname "$(dirname "$(readlink -f "$0")")" )
 CONFIGFILE="$ROOT_DIR/config.yml"
 HELPFILE="$ROOT_DIR/help.txt"
 ARGS="$@"
-CMD_LIST="$ROOT_DIR/src/list.sh"
-CMD_TASK="$ROOT_DIR/src/task.sh"
+
+CMD_ACCOUNT="$ROOT_DIR/src/accounts-manager.sh"
+CMD_BILL="$ROOT_DIR/src/task.sh" # rename to bills-manager.sh
+CMD_LIST="$ROOT_DIR/src/list.sh" # DEPRECATED
+CMD_TASK="$ROOT_DIR/src/task.sh" # DEPRECATED
 CMD_INSERT="$ROOT_DIR/src/insert.sh"
 CMD_BALANCE="$ROOT_DIR/src/balance.sh"
 CMD_PLAN="$ROOT_DIR/src/plan.sh"
+
 DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
@@ -40,19 +44,22 @@ load_config_file() {
 dispatch() {
   case "$1" in
   
-    help | --help | -h)    shift ; show_help    ;;
-    ver* | --version | -v) shift ; show_version ;;
-    list | ls | -l)        shift ; do_list "$@" ;;
-    # next | -n)             shift ; do_next "$@" ;;              # TODO
-    add  | -a)             shift ; do_insert "$@" ;;
-    log  | -aa)            shift ; do_insert "SPECIALARGS"   ;; # undocumented TODO
-    bal* | -b)             shift ; do_balance "$@"           ;;
-    plan | pdp | -p)       shift ; do_plan "$@"              ;; # undocced
-    --generate-*mail)      shift ; do_generate_email "$@"    ;; # undocumented TODO
-    --generate-task?)      shift ; do_generate_task "$@"     ;; # undocumented TODO
-    --generate-cal*)       shift ; do_generate_calendar "$@" ;; # undocumented TODO
+    help | --help | -h)     shift ; show_help    ;;
+    ver* | --version | -v)  shift ; show_version ;;
+    acc* | --account* | -A) shift ; do_account   ;;
+    bill* | --bill | -b)    shift ; do_bill      ;;
+    list | ls | -l)         shift ; do_list "$@" ;;
+    # next | -n)            shift ; do_next "$@" ;;              # TODO
+    add  | -a)              shift ; do_insert "$@" ;;
+    log  | -aa)             shift ; do_insert "SPECIALARGS"   ;; # undocumented TODO
+    bal* | -B)              shift ; do_balance "$@"           ;;
+    plan | pdp | -p)        shift ; do_plan "$@"              ;; # undocced
+    --generate-*mail)       shift ; do_generate_email "$@"    ;; # undocumented TODO
+    --generate-task?)       shift ; do_generate_task "$@"     ;; # undocumented TODO
+    --generate-cal*)        shift ; do_generate_calendar "$@" ;; # undocumented TODO
     
-    '') dispatch "$DEFAULT_FN"  ;;
+    # '') dispatch "$DEFAULT_FN"  ;;
+    '') do_summary ;;
     * ) do_task "$ARGS" ;;
     
   esac
@@ -60,11 +67,17 @@ dispatch() {
 
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
 
+do_account() { "$CMD_ACCOUNT" "$@" ; }
+do_bill()    { "$CMD_BILL"    "$@" ; }
 do_list()    { "$CMD_LIST"    "$@" ; }
 do_task()    { "$CMD_TASK"    "$@" ; }
 do_insert()  { "$CMD_INSERT"  "$@" ; }
 do_balance() { "$CMD_BALANCE" "$@" ; }
 do_plan()    { "$CMD_PLAN"    "$@" ; }
+do_summary() {
+  coin balance
+  coin bills
+}
 
 show_help() { echo -e "$(cat $HELPFILE)" | less ; }
 show_version() { echo -e "coin $VERSION" ; }

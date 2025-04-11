@@ -5,15 +5,16 @@
   \e[32mcoin\e[0m \e[32m[SUBCOMMAND]\e[0m \e[33m[OPTIONS]\e[0m \e[36m[ARGS]\e[0m  # Native-style
 
 \e[1mNATIVE SUBCOMMANDS\e[0m
+  \e[32m \e[0m         Show a combination of reports: current balance, bills, etc.
   \e[32mhelp\e[0m      Show this message
   \e[32mversion\e[0m   Print version number
-  \e[32mlist\e[0m      Show upcoming bills (default)
-  \e[32mbalance\e[0m   Query or update current balances
-  \e[32mplan\e[0m      Query or update payment distribution plans
-  \e[32madd\e[0m       NOT IMPLEMENTED
-  \e[32mpay\e[0m       NOT IMPLEMENTED
-  \e[32mparse\e[0m     NOT IMPLEMENTED
-  \e[32mconfig\e[0m    NOT IMPLEMENTED 
+  \e[32mbills\e[0m     Query or update bills (bill-manager)
+  \e[32mbalance\e[0m   Query or update balance (account-manager)
+  \e[32mplan\e[0m      Query or update payment distribution plans (pdp-manager)
+  \e[32mnew\e[0m       Create a new object: a bill, a plan, a contract, ... NOT IMPLEMENTED
+  \e[32mlist\e[0m      Show upcoming bills (default) DEPRECATED
+  \e[32madd\e[0m       Creates a new bill (Next update: Alias to `bills add`)
+  \e[32mpay\e[0m       Alias to `bills pay` NOT IMPLEMENTED
 
 \e[1mTASKWARRIOR COMMANDS\e[0m
   \e[35mmodify\e[0m    Edit existing bill
