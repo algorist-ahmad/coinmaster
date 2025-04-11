@@ -22,7 +22,7 @@ SUCCESS=0
 main() {
   # load_config
   # check_files
-  if [[ -z "$ARGS" ]]; then edit_new_bill; fi
+  if [[ -z "$ARGS" ]]; then add_bill_interactively; fi
   if [[ -n "$ARGS" ]]; then add_bill "$ARGS" ; fi
   # if SUCCESS=1, run update_timestamp NOT IMPLEMENTED
 }
@@ -37,5 +37,13 @@ edit_new_bill() {
 add_bill() {
   task add $@
 }
+
+add_bill_interactively() {
+    warn "Define proj, amount, recur, due, payee, priority, and desc:"
+    task=$(txtin)
+    task add $task
+}
+
+warn() { echo -e "\e[33m$@\e[0m"; }
 
 main

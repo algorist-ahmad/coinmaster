@@ -26,6 +26,10 @@ include dark-256.theme
   # color settings
     rule.precedence.color=overdue,scheduled,due.today,due,uda.,deleted,completed,active,keyword.,tag.,project.,blocked,blocking,recurring,tagged
 
+# ALIASES ******************************************************************************************
+
+  alias.set=modify
+
 # UDAs *********************************************************************************************
 
   # priority **************************************
@@ -78,7 +82,7 @@ include dark-256.theme
   #
   report.next.columns=id,paid.indicator,status,project,description,amount,due.relative,source,payee,priority,recur,uuid.short
   report.next.labels=ID,✅,status,series,desc,💲,due,from,to,P,recur,uuid
-  report.next.filter=( paid: -TEMPLATE -WAITING ) or ( due.after:now-2wk and due.before:now+2wk -TEMPLATE -WAITING )
+  report.next.filter=( due.after:now-2wk due.before:now+2wk -TEMPLATE -WAITING ) or ( due.none: )
   report.next.sort=urgency-,due+
   # /next
 
