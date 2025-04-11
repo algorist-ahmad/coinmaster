@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Query or update balance
+# Create or update payment distribution plan (PDP)
 
 # TESTS: FAIL
 
@@ -16,8 +16,7 @@ source "$ROOT/src/load-config.sh"
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"
 SUCCESS=0
-ACCOUNTS_DATA="$COINDATA/accounts"
-BALANCE_FILE="$ACCOUNTS_DATA/balance.json"
+PDP_DATA="$COINDATA/pdplans"
 
 # SYNTAX:
 # for query: balance.sh [-q|]
@@ -25,13 +24,7 @@ BALANCE_FILE="$ACCOUNTS_DATA/balance.json"
 # for update amounts: balance.sh -u <account_name> <amount>
 main() {
   # load_config
-  case "$1" in
-    help | --help)     display_help ;;
-    query | -q | '')   query_balances ;;
-    edit | -e )        edit_accounts_file ;;
-    update | set | -u) update_balance "$@" ;;
-    move | mv )        move_amount "$@" ;;
-  esac
+  >&2 echo PLAN IS NOT IMPLEMENTED, BEGIN BY CREATING ISSUES
 }
 
 query_balances() {
@@ -39,18 +32,18 @@ query_balances() {
 
   # Get all balances as a list, sum them with bc
   local total_balance
-  total_balance=$(yq -r '.[].balance' "$BALANCE_FILE" | paste -sd+ | bc)
+  total_balance=$(yq -r '.[].balance' "$BALANCES_FILE" | paste -sd+ | bc)
 
   # Generate table with total
   (
     echo "Account Balance Updated"
-    yq -r '.[] | [.name, .balance, .updated] | join(" ")' "$BALANCE_FILE"
+    yq -r '.[] | [.name, .balance, .updated] | join(" ")' "$BALANCES_FILE"
     printf "\e[31mTotal\e[0m %s \n" "$total_balance"
   ) | column -t
 }
 
 edit_accounts_file() {
-  $EDITOR "$BALANCE_FILE"
+  $EDITOR "$BALANCES_FILE"
 }
 
 update_balance() {
@@ -71,14 +64,14 @@ update_balance() {
   fi
 
   # Verify account exists
-  if ! yq -e ".[] | select(.name == \"$account\")" "$BALANCE_FILE" > /dev/null; then
+  if ! yq -e ".[] | select(.name == \"$account\")" "$BALANCES_FILE" > /dev/null; then
     echo "Error: Account '$account' not found"
     exit 1
   fi
 
   # Update balance and timestamp
   current_time=$(date -u +"%Y-%m-%dT%H%M%SZ")
-  yq ".[] |= if (.name == \"$account\") then (.balance = $amount | .updated = \"$current_time\") else . end" "$BALANCE_FILE" > "$tmp" && mv "$tmp" "$BALANCE_FILE"
+  yq ".[] |= if (.name == \"$account\") then (.balance = $amount | .updated = \"$current_time\") else . end" "$BALANCES_FILE" > "$tmp" && mv "$tmp" "$BALANCES_FILE"
 
   echo "Success: Updated $account balance to $amount at $current_time"
 }
@@ -108,7 +101,7 @@ move_amount() {
 
   # Verify accounts exist
   for account in "$source" "$dest"; do
-    if ! yq -e ".[] | select(.name == \"$account\")" "$BALANCE_FILE" > /dev/null; then
+    if ! yq -e ".[] | select(.name == \"$account\")" "$BALANCES_FILE" > /dev/null; then
       echo "Error: Account '$account' not found"
       exit 1
     fi
@@ -132,7 +125,7 @@ move_amount() {
         end
       )
     end
-  ' "$BALANCE_FILE"
+  ' "$BALANCES_FILE"
 
   echo "Success: Moved $amount from $source to $dest at $current_time"
 }

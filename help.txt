@@ -9,6 +9,7 @@
   \e[32mversion\e[0m   Print version number
   \e[32mlist\e[0m      Show upcoming bills (default)
   \e[32mbalance\e[0m   Query or update current balances
+  \e[32mplan\e[0m      Query or update payment distribution plans
   \e[32madd\e[0m       NOT IMPLEMENTED
   \e[32mpay\e[0m       NOT IMPLEMENTED
   \e[32mparse\e[0m     NOT IMPLEMENTED
