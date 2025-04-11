@@ -1,0 +1,163 @@
+#!/bin/bash
+
+# Taskwarrior program configuration file MODIFIED for Coinmaster
+
+# IMPORTED FILES ***********************************************************************************
+
+include dark-256.theme
+
+# GENERAL SETTINGS *********************************************************************************
+
+  # editor summoned when doing `task edit`
+    editor=$EDITOR
+  # DO NOT PROPAGATE CHANGES TO OTHER CHILDREN
+    recurrence.confirmation=no
+    recurrence.limit=2
+  # make search case INsensitive
+    search.case.sensitive=0
+  # verbosity
+    verbose=affected,blank,context,footnote,label,new-id,project,special,sync,override,recur
+  # empty columns shown
+    print.empty.columns=yes
+  # run reports in read only to avoid useless commits and merging conflicts
+    # gc=0
+  # default command following `task`
+    default.command=next
+  # color settings
+    rule.precedence.color=overdue,scheduled,due.today,due,uda.,deleted,completed,active,keyword.,tag.,project.,blocked,blocking,recurring,tagged
+
+# UDAs *********************************************************************************************
+
+  # priority **************************************
+  uda.priority.values=C,H,E,N,L,T
+  uda.priority.default=N
+  color.uda.priority.C=color255 on color173
+  color.uda.priority.H=color250
+  color.uda.priority.M=color245
+  color.uda.priority.L=color242
+  color.uda.priority.T=color240
+
+  # source **************************************
+  uda.source.label=source
+  uda.source.type=string
+
+  # payee **************************************
+  uda.payee.label=payee
+  uda.payee.type=string
+
+  # amount **************************************
+  uda.amount.label=amount
+  uda.amount.type=numeric
+
+  # paid
+  uda.paid.label=paid
+  uda.paid.type=string
+  uda.paid.values=yes
+  uda.paid.default=
+  uda.paid.indicator=✅
+  color.uda.paid.yes=gray10
+
+# URGENCY TUNING ***********************************************************************************
+
+  urgency.user.tag.next.coefficient=20
+  urgency.user.tag.auto.coefficient=1.5    # relating to my vehicles
+
+  urgency.uda.priority.C.coefficient=6.0     # CRITICAL
+  urgency.uda.priority.H.coefficient=3.0     # HIGH
+  urgency.uda.priority.E.coefficient=1.5     # ELEVATED
+  urgency.uda.priority.N.coefficient=0.0     # NORMAL
+  urgency.uda.priority.L.coefficient=-0.25   # LOW
+  urgency.uda.priority.T.coefficient=-0.5    # TRIVIAL
+
+# REPORTS ******************************************************************************************
+
+  # TODO: 4 degrees of details in order: minimal, ls, list, long  
+
+  # next
+  report.next.description=All unpaid bills or paid bills up to 2 weeks ahead, sorted by urgency
+  #
+  report.next.columns=id,paid.indicator,status,project,description,amount,due.relative,source,payee,priority,recur,tags,uuid.short
+  report.next.labels=ID,✅,status,series,desc,💲,due,from,to,pri,recur,tags,uuid
+  report.next.filter=( paid: -TEMPLATE ) or ( due.after:now-2wk and due.before:now+2wk -TEMPLATE )
+  report.next.sort=urgency-,due+
+  # /next
+
+  # reveal uuid
+
+  report.uuid.description=Reveal the UUIDs of tasks
+  report.uuid.columns=id,uuid,description,status.short
+  report.uuid.labels=id,uuid,description,st
+  report.uuid.sort=id+
+
+  # Tasks to do today
+
+  # report.todo.description=Tasks to be fulfilled today
+  # report.todo.columns=id,start.age,entry.age,depends,priority,project,tags,recur,scheduled.countdown,due.relative,until.remaining,description,urgency
+  # report.todo.labels=ID,Active,Age,Deps,P,Project,Tag,Recur,S,Due,Until,Description,Urg
+  # report.todo.context=1
+  # report.todo.filter=+PENDING -WAITING ( +ACTIVE or +TOMORROW or +YESTERDAY or +next or +todo or +TODO or scheduled:today or due.before:7days) limit:page
+  # report.todo.sort=urgency-
+
+  # minimal report for jrnl
+
+  # report.jrnl.description=Minimal report for my journal
+  # report.jrnl.columns=uuid.short,description
+  # report.jrnl.labels=id,desc
+  # report.jrnl.sort=urgency+
+
+  # deleted tasks
+
+  report.trash.description=List all deleted tasks
+  report.trash.columns=status.short,uuid.short,description      # we need to specify the columns in the report, and the order in which those are shown
+  report.trash.labels=St,uuid,desc                      # Labels are the column heading labels in the report.
+  report.trash.sort=entry+
+  report.trash.filter=status:deleted
+
+  # last inserted
+
+  report.last_insert.description=Reports all info on last inserted task
+  report.last_insert.columns=id,uuid.short,status,start.active,depends.indicator,priority,project.parent,tags,recur.indicator,wait.remaining,scheduled.remaining,due,until.remaining,description
+  report.last_insert.labels=ID,UUID,Status,A,D,P,Project,Tags,R,Wait,Sch,Due,Until,Description
+  report.last_insert.sort=entry-
+  report.last_insert.filter=limit:1 status:pending
+
+  # all (enhanced) ***********************************************************
+  
+    report.all.columns=id,status.short,uuid.short,start.active,entry.age,end.age,depends.indicator,priority,project.parent,tags.count,recur.indicator,wait.remaining,scheduled.remaining,due.countdown,until.remaining,description
+
+# Guidance *****************************************************************************************
+
+# 
+#        color.uda.X=on green
+#               Colors any task that has the user defined attribute X.
+# 
+#        color.uda.X.VALUE=on green
+#               Colors any task that has the user defined attribute X set to VALUE.
+# 
+#        color.uda.X.none=on green
+#               Colors any task that does not have the user defined attribute X.
+       # urgency.uda.<name>.coefficient=...
+       #        Presence/absence of UDA data.
+       # urgency.uda.<name>.<value>.coefficient=...
+       #        Specific value of UDA data.
+ # uda.<name>.type=string|numeric|date|duration
+ #               Defines a UDA called '<name>', of the specified type.
+ # 
+ #        uda.<name>.label=<column heading>
+ #               Provides a default report label for the UDA called '<name>'.
+ # 
+ #        uda.<name>.values=A,B,C
+ #               For  type  'string'  UDAs  only, this provides a comma-separated list of acceptable
+ #               values. In this example, the '<name>' UDA may only contain values 'A', 'B', or 'C',
+ #               but may also contain no value.
+ # 
+ #               Note  that  the  order  of  the value is important, and denotes the sort order from
+ #               highest ('A') to lowest ('C').
+ # 
+ #               Note that a blank value is permitted.
+ # 
+ #        uda.<name>.default=...
+ #               Provides a default value for the UDA called '<name>'.
+
+# MISC *********************************************************************************
+news.version=3.3.0

@@ -1,0 +1,2 @@
+default_command: next # default subcommand and its arguments
+database: $NEXUS/coin/coin.db

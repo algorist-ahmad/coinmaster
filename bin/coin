@@ -1,0 +1,77 @@
+#!/bin/bash
+
+VERSION='0.1.0'
+
+# Entry point to my program. Loads config.yml then routes to the appropriate subprogram as instrcuted
+# from the first argument.
+
+# TESTS: PASSED but undocumented
+
+# FIXME:
+# [ ] No error handling for missing or nonesense config.yml
+# [ ] No validation of yq output in config_get
+
+# TODO:
+# [ ] Add config file validation
+# [ ] Implement proper argument parsing
+# [ ] Add logging functionality
+
+ROOT_DIR=$( dirname "$(dirname "$(readlink -f "$0")")" )
+CONFIGFILE="$ROOT_DIR/config.yml"
+HELPFILE="$ROOT_DIR/help.txt"
+ARGS="$@"
+CMD_LIST="$ROOT_DIR/src/list.sh"
+CMD_TASK="$ROOT_DIR/src/task.sh"
+CMD_INSERT="$ROOT_DIR/src/insert.sh"
+CMD_BALANCE="$ROOT_DIR/src/balance.sh"
+CMD_PLAN="$ROOT_DIR/src/plan.sh"
+DEFAULT_FN='undefined_function'  # Defined in config
+
+main() {
+  load_config_file
+  dispatch $ARGS
+}
+
+# load config from config.yml
+load_config_file() {
+  DEFAULT_FN=$(config_get 'default_command')
+}
+
+dispatch() {
+  case "$1" in
+  
+    help | --help | -h)    shift ; show_help    ;;
+    ver* | --version | -v) shift ; show_version ;;
+    list | ls | -l)        shift ; do_list "$@" ;;
+    # next | -n)             shift ; do_next "$@" ;;              # TODO
+    add  | -a)             shift ; do_insert "$@" ;;
+    log  | -aa)            shift ; do_insert "SPECIALARGS"   ;; # undocumented TODO
+    bal* | -b)             shift ; do_balance "$@"           ;;
+    plan | pdp | -p)       shift ; do_plan "$@"              ;; # undocced
+    --generate-*mail)      shift ; do_generate_email "$@"    ;; # undocumented TODO
+    --generate-task?)      shift ; do_generate_task "$@"     ;; # undocumented TODO
+    --generate-cal*)       shift ; do_generate_calendar "$@" ;; # undocumented TODO
+    
+    '') dispatch "$DEFAULT_FN"  ;;
+    * ) do_task "$ARGS" ;;
+    
+  esac
+}
+
+config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
+
+do_list()    { "$CMD_LIST"    "$@" ; }
+do_task()    { "$CMD_TASK"    "$@" ; }
+do_insert()  { "$CMD_INSERT"  "$@" ; }
+do_balance() { "$CMD_BALANCE" "$@" ; }
+do_plan()    { "$CMD_PLAN"    "$@" ; }
+
+show_help() { echo -e "$(cat $HELPFILE)" | less ; }
+show_version() { echo -e "coin $VERSION" ; }
+
+# handle_unknown_args() {
+#   >&2 echo "PASSING TO COMMAND: list.sh"
+#   do_list $ARGS
+# }
+
+main
