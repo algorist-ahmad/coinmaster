@@ -7,6 +7,9 @@
 # TESTS:  FAIL
 
 ROOT=$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")")" )
+
+source "$ROOT/src/transaction/forms.sh"
+
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"
 HELPFILE="$ROOT/src/transaction/help.txt"
@@ -31,18 +34,30 @@ dispatch() {
 show_help() { echo -e "$(cat $HELPFILE)" | less ; }
 
 insert_txn() {
-  echo "
-  are there arguments or no?
-  If no args:
-    Is it a recurring bill or a single transaction?
+  if _empty "$@"
+    then add_txn_interactively
+    else task add "$@"
+  fi
+  
+  # echo "
+  # are there arguments or no?
+  # If no args:
+  #   Is it a recurring bill or a single transaction?
 
-  If single: skip recur attributes
-    Has it been paid already?
+  # If single: skip recur attributes
+  #   Has it been paid already?
 
-  If recurring:
-    prompt for each attribute one by one, validate along the way
-  "
+  # If recurring:
+  #   prompt for each attribute one by one, validate along the way
+  # "
 }
+
+add_txn_interactively() {
+  result=$(launch_transaction_form) # YAML expected
+  echo $result
+}
+
+_empty() { [[ -z "$@" ]] ; }
 
 main
 
