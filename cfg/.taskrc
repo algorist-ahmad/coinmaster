@@ -80,8 +80,8 @@ include dark-256.theme
   # next
   report.next.description=All unpaid bills or paid bills up to 2 weeks ahead, sorted by urgency
   #
-  report.next.columns=id,paid.indicator,status,project,description,amount,due.relative,source,payee,priority,recur,uuid.short
-  report.next.labels=ID,✅,status,series,desc,💲,due,from,to,P,recur,uuid
+  report.next.columns=id,paid.indicator,status,description.truncated_count,amount,due.relative,source,payee,priority,recur,uuid.short,tags
+  report.next.labels=ID,✅,status,desc,💲,due,from,to,P,recur,uuid,tags
   report.next.filter=( due.after:now-2wk due.before:now+2wk -TEMPLATE -WAITING ) or ( due.none: )
   report.next.sort=urgency-,due+
   # /next

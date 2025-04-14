@@ -2,6 +2,8 @@
 
 # Create or update payment distribution plan (PDP)
 
+# STATUS: not implemented
+
 # TESTS: FAIL
 
 # FIXME:
@@ -11,7 +13,7 @@
 
 ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
 
-source "$ROOT/src/load-config.sh"
+# source "$ROOT/src/load-config.sh"
 
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"

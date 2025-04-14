@@ -1,33 +1,35 @@
 #!/bin/bash
 
-VERSION='0.1.0'
+VERSION='0.2.0'
 
 # Entry point to my program. Loads config.yml then routes to the appropriate subprogram as instrcuted
 # from the first argument.
 
-# TESTS: PASSED but undocumented
-
-# FIXME:
-# [ ] No error handling for missing or nonesense config.yml
-# [ ] No validation of yq output in config_get
-
-# TODO:
-# [ ] Add config file validation
-# [ ] Implement proper argument parsing
-# [ ] Add logging functionality
+# STATUS: NOTHING PLANNED
+# TESTS:  PASSED but undocumented
 
 ROOT_DIR=$( dirname "$(dirname "$(readlink -f "$0")")" )
 CONFIGFILE="$ROOT_DIR/config.yml"
 HELPFILE="$ROOT_DIR/help.txt"
 ARGS="$@"
 
-CMD_ACCOUNT="$ROOT_DIR/src/accounts/manager.sh"
-CMD_BILL="$ROOT_DIR/src/task.sh" # rename to bills-manager.sh
-CMD_LIST="$ROOT_DIR/src/list.sh" # DEPRECATED
-CMD_TASK="$ROOT_DIR/src/task.sh" # DEPRECATED
-CMD_INSERT="$ROOT_DIR/src/insert.sh"
-CMD_BALANCE="$ROOT_DIR/src/balance.sh"
-CMD_PLAN="$ROOT_DIR/src/plan.sh"
+# Define options as an array to preserve spaces
+COIN_OBJECTS=(
+  "transaction:txn"
+  "bill:bill"
+  "payment distribution plan:plan"  # No escaping needed in array
+  "contract:contract"
+)
+
+CMD_ACCOUNT="$ROOT_DIR/src/account/manager.sh"
+CMD_TRANSAC="$ROOT_DIR/src/transaction/manager.sh"
+CMD_PLAN="$ROOT_DIR/src/pdplan/manager.sh"
+
+CMD_BILL="$ROOT_DIR/src/task.sh" # FLAGGED FOR REMOVAL
+CMD_LIST="$ROOT_DIR/src/list.sh" # FLAGGED FOR REMOVAL
+CMD_TASK="$ROOT_DIR/src/task.sh" # FLAGGED FOR REMOVAL
+CMD_INSERT="$ROOT_DIR/src/insert.sh" # FLAGGED FOR REMOVAL
+CMD_BALANCE="$ROOT_DIR/src/balance.sh" # FLAGGED FOR REMOVAL
 
 DEFAULT_FN='undefined_function'  # Defined in config
 
@@ -43,24 +45,32 @@ load_config_file() {
 
 dispatch() {
   case "$1" in
-  
+    # standard
     help | --help | -h)     shift ; show_help    ;;
     ver* | --version | -v)  shift ; show_version ;;
-    acc* | --account* | -A | bal*) shift ; do_account "$@"  ;;
-    bill* | --bill | -b)    shift ; do_bill      ;;
-    list | ls | -l)         shift ; do_list "$@" ;;
-    # next | -n)            shift ; do_next "$@" ;;              # TODO
-    add  | -a)              shift ; do_insert "$@" ;;
-    log  | -aa)             shift ; do_insert "SPECIALARGS"   ;; # undocumented TODO
-    # bal* | -B)              shift ; do_balance "$@"           ;;
-    plan | pdp | -p)        shift ; do_plan "$@"              ;; # undocced
+
+    # general
+      new) shift ; create_new_object "$@" ;;
+    --dev) shift ; echo "DEV MODE: shortcut to gh and git to aid in development" ;;
+
+    # managers
+    acc* | --account* | -A | bal*) shift ; do_account "$@" ;;
+    txn  | --txn | trans* | -t)    shift ; do_transac "$@" ;; # replaces `bill`
+    plan | --plan | -P )           shift ; do_plan    "$@" ;; # undocced
+
+    # shortcuts
+    add   | --add  | -a)  shift ; do_transac add  "$@"   ;; # untested
+    bill* | --bill | -b)  shift ; do_transac bill "$@"   ;; # untested
+    log   | --log  | -aa) shift ; do_transac log  "$@"   ;; # not implemented
+
+    # unimplemented
     --generate-*mail)       shift ; do_generate_email "$@"    ;; # undocumented TODO
     --generate-task?)       shift ; do_generate_task "$@"     ;; # undocumented TODO
     --generate-cal*)        shift ; do_generate_calendar "$@" ;; # undocumented TODO
     
-    # '') dispatch "$DEFAULT_FN"  ;;
-    '') do_summary ;;
-    * ) do_task "$ARGS" ;;
+    # catch-all
+    '') do_summary         ;;
+    * ) do_transac "$ARGS" ;;
     
   esac
 }
@@ -68,15 +78,22 @@ dispatch() {
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
 
 do_account() { "$CMD_ACCOUNT" "$@" ; }
-do_bill()    { "$CMD_BILL"    "$@" ; }
-do_list()    { "$CMD_LIST"    "$@" ; }
-do_task()    { "$CMD_TASK"    "$@" ; }
-do_insert()  { "$CMD_INSERT"  "$@" ; }
-do_balance() { "$CMD_BALANCE" "$@" ; }
+do_transac() { "$CMD_TRANSAC" "$@" ; }
 do_plan()    { "$CMD_PLAN"    "$@" ; }
+
+do_bill()    { "$CMD_BILL"    "$@" ; } # DEPRECATED
+do_list()    { "$CMD_LIST"    "$@" ; } # DEPRECATED
+do_task()    { "$CMD_TASK"    "$@" ; } # DEPRECATED
+do_insert()  { "$CMD_INSERT"  "$@" ; } # DEPRECATED
+do_balance() { "$CMD_BALANCE" "$@" ; } # DEPRECATED
+
+# The original purpose of Coinmaster was simply to track bills deadlines and view account balances.
+# This summary adheres to this original purpose.
 do_summary() {
-  coin balance
-  coin bills
+  echo -e "Upcoming bills:"
+  do_transac +bill           # view upcoming bills
+  do_account balance --total # view total balance
+  echo -e "\nDo \`coin acc\` to check balance"
 }
 
 show_help() { echo -e "$(cat $HELPFILE)" | less ; }
@@ -86,5 +103,17 @@ show_version() { echo -e "coin $VERSION" ; }
 #   >&2 echo "PASSING TO COMMAND: list.sh"
 #   do_list $ARGS
 # }
+
+# txn, bill, plan, contract
+create_new_object() {
+  object_to_create=$(gum choose --header="New what?" --cursor="> new " --label-delimiter=":" "${COIN_OBJECTS[@]}")
+
+  case "$object_to_create" in
+    txn) echo "COMMAND: coin txn new" ;;
+    bill) echo "Sending request to transaction manager!"  ;;
+    plan) echo "Sending request to plan manager!"  ;;
+    contract) echo "Sending request to contract manager!"  ;;
+  esac 
+}
 
 main
