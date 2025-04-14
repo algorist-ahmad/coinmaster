@@ -16,7 +16,7 @@ source "$ROOT/src/load-config.sh"
 
 ARGS="$@"
 TASKRC="$ROOT/cfg/.taskrc"
-TASKDATA="$COINDATA/bills"
+TASKDATA="$COINDATA/txn"
 
 main() {
   load_config
