@@ -15,7 +15,7 @@ TASKRC="$ROOT/cfg/.taskrc"
 TASKDATA="$COINDATA/txn"
 
 # forms
-NEW_TXN_FORM="$ROOT/src/transaction/form/insert.sh"
+NEW_TXN_FORM="$ROOT/src/transaction/form/insert_txn.sh"
 
 main() {
   dispatch $ARGS
