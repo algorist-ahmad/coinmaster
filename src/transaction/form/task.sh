@@ -2,13 +2,8 @@
 
 # Execute task commands as they are on behalf of coinmaster
 
-# TESTS: FAIL
-
-# FIXME:
-
-# TODO:
-# [ ] load and override variables TASKDATA and TASKRC
-# [ ] 
+# STATUS: FLAGGED FOR REMOVAL
+# TESTS:  FAIL
 
 ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
 
