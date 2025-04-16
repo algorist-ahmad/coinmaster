@@ -1,0 +1,20 @@
+coin add
+? Description (required): testing multi word desc
+? To yo mama
+? $ 1
+? Deadline: 2025-04-17T00:00:00
+TESTING: task add desc:'testing multi word desc' amount:'1' payee:'yo mama'
+Created task 1.
+
+ID St UUID     A Age Done D P Project Tags R Wait Sch Due Until Description           
+ 1 P  b1c88d88     -        N                                   multi word desc' mama'
+
+1 task
+EXECUTE QUERY NOW
+W16T1607 ~/src/coinmaster ✎2 ● txn $ task task add desc:'testing multi word desc' amount:'1' payee:'yo mama'
+Created task 2.
+W16T1608 ~/src/coinmaster ✎2 ● txn $ task
+
+ID ✅ status  desc                        💲 due from to      P recur uuid     tags
+ 1    Pending multi word desc' mama'       1          'yo     N       b1c88d88
+ 2    Pending testing multi word desc      1          yo mama N       0cadec29     

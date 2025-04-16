@@ -1,26 +1,15 @@
 #!/bin/bash
 
-# Collect and validate user input to create a new transaction. This script does no database transactions,
-# it simply collects, process, and redirects data. Output must be YAML.
-# IDEA: insert task into temporary database, then export to JSON for inspection. If all looks good, import into realdb
+# This script makes no database transactions, it simply collects and validates user input
+# and saves to a YAML file.
 
-# STATUS: IN PROGRESS - ISSUE 12
+# STATUS: REVIEWING - ISSUE 12
 # TESTS:  FAIL
-
-  # echo "
-  # are there arguments or no?
-  # If no args:
-  #   Is it a recurring bill or a single transaction?
-
-  # If single: skip recur attributes
-  #   Has it been paid already?
-
-  # If recurring:
-  #   prompt for each attribute one by one, validate along the way
-  # "
 
 ROOT=$( dirname "$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")")")")
 ARGS="$@"
+TMPDIR='/tmp/coinmaster'
+OUTPUT_FILE=''
 TASKDATA='/tmp'
 TASKRC="$COINRC"
 TAGS_LIST="auto:+auto bill:+bill wishlist:+wish next:+next grocery:+grocery supplies:+supplies"
@@ -31,80 +20,59 @@ RECURRING_TAG="+bill"
 GUM_INPUT_PROMPT_FOREGROUND="38"
 ctrlc_count=0
 
-trap no_ctrlc SIGINT
+trap handle_interrupt SIGINT
 
 main() {
-  # get user input
-  
-  collect_user_input
-  # data=$(collect_user_input) # YAML
-  # from user input create a valid Taskwarrior syntax string
-  # query=$(collect_user_input)
-  # echo "$query"
-  # query=$(convert_to_query "$data")
-  # query=(printf "%s" "${data[@]}")
-  # echo "$query"
-  # create fake database TASKDATA using same TASKRC
-  # execute
-  # task add $query
-  # successful?
-    # if not, exit with error
-    # if yes, exit 0 with YAML
+  initialize_form_metadata
+  form=$(collect_user_input)
+  # if data has been collected without error, set success as true and output filename
+  # if something happened, like SIGINT for example, set success as false and set error to a useful error message, then output file name
+  echo $form
 }
 
-# collect user input and return as YAML
+initialize_form_metadata() {
+  OUTPUT_FILE=$(mktemp $TMPDIR/form.XXX.yml)
+  yq -i '
+    .success = false |
+    .error = ""      |
+    .form.name = "New transaction" |
+    .form.desc = "" |
+    .form.status = "INCOMPLETE"'\
+  $OUTPUT_FILE
+}
+
+# collect user input and return YAML form filename
 collect_user_input() {
-  # Phase 1: Data Collection
-  local -A data=()
-
-  # Core fields
-  data[description]=$(_get_desc) || continue
-  data[payee]=$(_get_payee) || continue
-  data[amount]=$(_get_amount) || continue
-  data[due]=$(_get_due) || continue
-  data[priority]=$(_get_priority) || continue
-
-  # Recurring transaction fields
+  desc=$(_get_desc)
+  payee=$(_get_payee)
+  amount=$(_get_amount)
+  due=$(_get_due)
   if is_recurring; then
-    RECURRING=1
-    data[recurring_frequency]=$(_get_recur) || continue
-    data[recurring_source]=$(_get_source) || continue
-    data[recurring_until]=$(_get_until) || continue
+    recur=$(_get_recur)
+    source=$(_get_source)
+    until=$(_get_until)
+  fi
+  if additionnal_info_requested; then
+    priority=$(_get_priority)
+    if tags_requested; then tags=$(_get_tags); fi
+    note=$(_get_note)
   fi
 
-  # Tags collection
-  if tags_requested; then
-    data[tags]=$(_get_tags) || continue
-  fi
+  yq -i "
+    .form.fields.desc = \"$desc\"         |
+    .form.fields.amount = \"$amount\"     |
+    .form.fields.payee = \"$payee\"       |
+    .form.fields.due = \"$due\"           |
+    .form.fields.priority = \"$priority\" |
+    .form.fields.recur = \"$recur\"       |
+    .form.fields.source = \"$source\"     |
+    .form.fields.until = \"$until\"       |
+    .form.fields.tags = \"$tags\"         |
+    .form.fields.note = \"$note\"         |
+    .form.status = \"COMPLETE\"           "\
+  $OUTPUT_FILE # DO NOT FORGET TO ADD TAG +bill for RECURRING=1
 
-  # Build YAML (your existing code here)
-  # build_yaml data
-
-  # Phase 2: YAML Construction
-  local yaml=""
-  
-  # Core fields (always present)
-  yaml+="description: \"${data[description]}\"\n"
-  yaml+="payee: \"${data[payee]}\"\n"
-  yaml+="amount: ${data[amount]}\n"
-  yaml+="due: \"${data[due]}\"\n"
-  yaml+="priority: \"${data[priority]}\"\n"
-
-  # Conditional recurring block
-  if [[ -v data[recurring_frequency] ]]; then
-    yaml+="recurring:\n"
-    yaml+="  frequency: \"${data[recurring_frequency]}\"\n"
-    yaml+="  source: \"${data[recurring_source]}\"\n"
-    yaml+="  until: \"${data[recurring_until]}\"\n"
-  fi
-
-  # Optional tags
-  if [[ -v data[tags] ]]; then
-    yaml+="tags: [${data[tags]}]\n"
-  fi
-
-  # Phase 3: Validation & Output
-  printf "%s" "$yaml" | yq eval -P -
+  echo $OUTPUT_FILE
 }
 
 construct_query() {
@@ -115,25 +83,21 @@ construct_query() {
 }
 
 is_recurring()   {
-  if [[ -z "$RECURRING_FLAG" ]]
-    then 
-      if gum confirm "Is this a recurring transaction?"
-        then
-          RECURRING_FLAG=1
-        else
-          RECURRING_FLAG=0
-      fi
-    else
-      if [[ "$RECURRING_FLAG" == "1" ]]
-        then
-          exit 0 # affirmative
-        else
-          exit 1 # negative
-      fi
-  fi  
+  if [[ -z "$RECURRING_FLAG" ]]; then 
+    if gum confirm "Is this a recurring transaction?"
+      then RECURRING_FLAG=1
+      else RECURRING_FLAG=0
+    fi
+  fi
+  if [[ "$RECURRING_FLAG" == "1" ]]
+    then return 0 # affirmative
+    else return 1 # negative
+  fi
 }
 
-tags_requested() { gum confirm "Add tags?" ; }
+additionnal_info_requested() { gum confirm "Add additional info?" ; }
+tags_requested()    { gum confirm "Add tags?" ; }
+
 
 _get_desc() {
   export GUM_INPUT_HEADER=""
@@ -169,17 +133,17 @@ _get_due() {
   export GUM_INPUT_PROMPT="Deadline: "
   export GUM_INPUT_PLACEHOLDER="ex: tomorrow, 3 days, 1 week, 21st, etc."
 
-  input=$(gum input --no-show-help --placeholder.italic --prompt.bold)
+  input=$(task calc "$(gum input --no-show-help --placeholder.italic --prompt.bold)")
   >&2 echo -e "\e[32m?\e[0m" "$GUM_INPUT_PROMPT""$input"
   echo "$input"
 }
 
 _get_recur() {
   export GUM_INPUT_HEADER="How often must this bill be paid?"
-  export GUM_INPUT_PROMPT="Recurrence: "
+  export GUM_INPUT_PROMPT="Recurs every "
   export GUM_INPUT_PLACEHOLDER="ex: 1 month, 2 weeks, 7 days... see \`task help\`"
 
-  input=$(gum input --no-show-help --placeholder.italic --prompt.bold)
+  input=$(task calc "$(gum input --no-show-help --placeholder.italic --prompt.bold)")
   >&2 echo -e "\e[32m?\e[0m" "$GUM_INPUT_PROMPT""$input"
   echo "$input"
 }
@@ -197,17 +161,17 @@ _get_source() {
 
 _get_until() {
   export GUM_INPUT_HEADER="Is there an end date to this agreement? (Leave blank if none)"
-  export GUM_INPUT_PROMPT="From "
+  export GUM_INPUT_PROMPT="Ends on "
   export GUM_INPUT_PLACEHOLDER="date"
 
-  input=$(gum input --no-show-help --placeholder.italic --prompt.bold)
+  input=$(task calc "$(gum input --no-show-help --placeholder.italic --prompt.bold)")
   >&2 echo -e "\e[32m?\e[0m" "$GUM_INPUT_PROMPT""$input"
   echo "$input"
 }
 
 _get_priority() {
   export GUM_CHOOSE_HEADER="How important is this transaction?"
-  export GUM_INPUT_PROMPT="Priority "
+  export GUM_INPUT_PROMPT="Priority: "
   export GUM_CHOOSE_SELECTED="$PRIORITY_DEFAULT"
   export GUM_CHOOSE_LABEL_DELIMITER=":"
 
@@ -219,8 +183,9 @@ _get_priority() {
 _get_tags() {
 
   export GUM_INPUT_HEADER=""
-  export GUM_CH_PROMPT="Tags: "
+  export GUM_CHOOSE_PROMPT="Tags: "
   export GUM_CHOOSE_LABEL_DELIMITER=":"
+  export GUM_CHOOSE_OUTPUT_DELIMITER=" "
    local input=""
 
   if is_recurring; then
@@ -228,8 +193,18 @@ _get_tags() {
     input+="$RECURRING_TAG "
   fi
 
-  input+="$(gum choose --no-limit --selected=$GUM_CHOOSE_SELECTED "$TAGS_LIST")"
+  input+="$(gum choose --no-limit --selected=$GUM_CHOOSE_SELECTED $TAGS_LIST)"
 
+  >&2 echo -e "\e[32m?\e[0m" "$GUM_CHOOSE_PROMPT""$input"
+  echo "$input"
+}
+
+_get_note() {
+  export GUM_INPUT_HEADER=""
+  export GUM_INPUT_PROMPT="Annotation: "
+  export GUM_INPUT_PLACEHOLDER="Any comment? Leave empty if none."
+
+  input=$(gum input --no-show-help --prompt.bold --placeholder.italic)
   >&2 echo -e "\e[32m?\e[0m" "$GUM_INPUT_PROMPT""$input"
   echo "$input"
 }
@@ -273,8 +248,8 @@ function no_ctrlc()
 }
 
 handle_interrupt() {
-  echo -e "\n\033[1;31mInput canceled\033[0m" >&2
-  exit 1
+  yq -i '.error = "INTERRUPTED BY USER"' $OUTPUT_FILE
+  >&2 echo -e "\n\033[1;31mInput canceled\033[0m"
 }
 
 main
