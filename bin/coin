@@ -35,7 +35,7 @@ DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
   load_config_file
-  dispatch $ARGS
+  dispatch $ARGS   # notice: no quotes, something changed here!
 }
 
 # load config from config.yml

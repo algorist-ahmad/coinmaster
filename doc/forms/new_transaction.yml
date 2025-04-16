@@ -1,0 +1,79 @@
+# standardized form description for creating a new transaction
+# every field has 3 core concepts: identification, collection method, and validation
+
+fields:
+  - id: desc
+    name: Description
+    # collection
+    input:
+      method: input                         # choose, confirm, filter, input, write
+      header: null
+      prompt: "Description (required): "
+      placeholder: null
+      whitelist: []                         # applicable to method choose
+      affirmative:                          # applicable to method confirm
+      negative:                             # applicable to method confirm
+      timeout:
+      options: '--height=15'                # other gum options not included in this form
+    # validation
+    rules:
+      type: string    # string, integer, real, boolean, date, duration, file, directory, or any (null)
+      # are empty values allowed
+      required: true
+      # if no value, given replace with this one
+      default: ~
+      # applicable to all, ultra specific value requirement
+      regex:
+        pattern: '/\S+@\S+\. \S+/'
+        desc: "description must be an email: __@__ (example)" 
+      # applicable to string, length allowed
+      length:
+        min: ~
+        max: 400
+      # applicable to numeric, date, and duration types, set min = 0 for positive values
+      range:
+        min: ~                # minimum value allowed
+        max: ~                # maximum value allowed
+      # applicable to file and directory types
+      assert_existence: false
+    # which other field does this one depend on?
+    dependencies: 
+    # external validation tool
+    external_validator: 
+    # identification
+  - id: amount
+    name: 
+    # collection
+    input:
+      method: input                         # choose, confirm, filter, input, write
+      header: "What's the amount which must be paid?"
+      prompt: "$ "
+      placeholder: "0.00$"
+      whitelist:                            # applicable to method choose
+      affirmative:                          # applicable to method confirm
+      negative:                             # applicable to method confirm
+      timeout:
+      options:                # other gum options not included in this form
+    # validation
+    rules:
+      type: real
+      required: true
+      default:
+      regex:
+        pattern:
+        desc:
+      # applicable to string, length allowed
+      length:
+        min:
+        max:
+      # applicable to numeric, date, and duration types, set min = 0 for positive values
+      range:
+        min: 0                # minimum value allowed
+        max: null               # maximum value allowed
+      # applicable to file and directory types only
+      assert_existence: false
+
+    # which other field does this one depend on?
+    dependencies: 
+    # external validation tool
+    external_validator: 
