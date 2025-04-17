@@ -4,12 +4,7 @@
 
 # TESTS: FAIL
 
-# FIXME:
-
-# TODO:
-# [ ] 
-
-ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
+ROOT=$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")" )" )
 
 source "$ROOT/src/load-config.sh"
 
@@ -32,6 +27,17 @@ main() {
     update | set | -u) update_balance "$@" ;;
     move | mv )        move_amount "$@" ;;
   esac
+}
+
+display_help() {
+  echo "
+  coin account
+
+  help
+  query
+  edit
+  set [account name] [balance]
+  mv [amount] [from account] [to account]"
 }
 
 query_balances() {
@@ -62,7 +68,7 @@ update_balance() {
 
   local account="$2"
   local amount="$3"
-  local tmp=$(mktemp)
+  local tmp_file=$(mktemp)
 
   # Validate numerical amount
   if ! [[ "$amount" =~ ^[0-9]+$ ]]; then
@@ -78,7 +84,7 @@ update_balance() {
 
   # Update balance and timestamp
   current_time=$(date -u +"%Y-%m-%dT%H%M%SZ")
-  yq ".[] |= if (.name == \"$account\") then (.balance = $amount | .updated = \"$current_time\") else . end" "$BALANCE_FILE" > "$tmp" && mv "$tmp" "$BALANCE_FILE"
+  yq eval ".[] |= select(.name == \"$account\") |= ( .balance = $amount | .updated = \"$current_time\" )" "$BALANCE_FILE" > "$tmp_file" && mv "$tmp_file" "$BALANCE_FILE"
 
   echo "Success: Updated $account balance to $amount at $current_time"
 }
@@ -137,15 +143,8 @@ move_amount() {
   echo "Success: Moved $amount from $source to $dest at $current_time"
 }
 
-display_help() {
-  echo "
-  coin balance ...
-
-  help
-  query
-  set [account name] [balance]
-  edit
-  mv [amount] [from account] [to account]"
+validate_file() {
+  :
 }
 
 main $@
