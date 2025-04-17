@@ -1,2 +1,16 @@
 default_command: next # default subcommand and its arguments
 database: $NEXUS/coin/coin.db
+priorities:
+  - 'trivial:T'
+  - 'low:L'
+  - 'normal:N'
+  - 'elevated:E'
+  - 'high:H'
+  - 'critical:C'
+tags:
+  - "auto:+auto"
+  - "bill:+bill"
+  - "wishlist:+wish"
+  - "next:+next"
+  - "grocery:+grocery"
+  - "supplies:+supplies"

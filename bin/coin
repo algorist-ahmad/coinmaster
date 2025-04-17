@@ -109,10 +109,10 @@ create_new_object() {
   object_to_create=$(gum choose --header="New what?" --cursor="> new " --label-delimiter=":" "${COIN_OBJECTS[@]}")
 
   case "$object_to_create" in
-    txn) echo "COMMAND: coin txn new" ;;
-    bill) echo "Sending request to transaction manager!"  ;;
-    plan) echo "Sending request to plan manager!"  ;;
-    contract) echo "Sending request to contract manager!"  ;;
+    txn) do_transac add  "$@" ;;
+    # bill) do_transac add  "$@"  ;;
+    plan) echo "Not implemented, create an issue with \`gh issue create\`"  ;;
+    contract) echo "Not implemented, create an issue with \`gh issue create\`"  ;;
   esac 
 }
 
