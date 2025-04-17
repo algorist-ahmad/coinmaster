@@ -3,7 +3,7 @@
 # This script makes no database transactions, it simply collects and validates user input
 # and saves to a JSON file.
 
-# STATUS: REVIEW - ISSUE 12
+# STATUS: DONE
 # TESTS:  PASS
 
 ROOT=$( dirname "$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")")")")

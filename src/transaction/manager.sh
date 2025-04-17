@@ -3,8 +3,8 @@
 # Query or update transactions database.
 # Expected args: [filter] <command> [mods]
 
-# STATUS: WORK IN PROGRESS - ISSUE 12, 13, AND 14
-# TESTS:  FAIL
+# STATUS: DONE
+# TESTS:  PASS
 
 ROOT=$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")")")
 
