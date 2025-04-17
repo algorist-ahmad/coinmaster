@@ -53,7 +53,7 @@ initialize() {
   # create temporary directories
   >&2 mkdir -pv "$TMPDIR/new-transactions"
   # create temporary output file
-  OUTPUT_FILE=$(mktemp form.XXX.json)
+  OUTPUT_FILE=$(mktemp $TMPDIR/new-transactions/form.XXX.json)
   echo '{}' > $OUTPUT_FILE # CRITICAL STEP
 }
 
@@ -215,7 +215,7 @@ _get_until() {
   export GUM_INPUT_PLACEHOLDER="date"
 
   input="$(gum input --no-show-help --placeholder.italic --prompt.bold)"
-  input="$(chrono_calc "$input")"
+  input="$(chrono_calc "$input" 2>/dev/null )"
 
   >&2 echo -e "\e[32m?\e[0m" "$GUM_INPUT_PROMPT""$input"
   echo "$input"

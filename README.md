@@ -1,28 +1,27 @@
+---
 
 # CoinMaster
 
-## 2025-04-04
+![Transaction Demo](./doc/coin-add-demo.gif)  
+*Demonstration of adding a transaction (basic CLI form interface)*
 
-Branch master is unmaintained and the schema is too complicated. Decided to use a real finance tool
-like GNUCash or Firefly III instead, and have coinmaster's responsability limited to simple bill deadlines
-management and reminding.
+A simple personal finance tracker using TaskWarrior as its backbone.
 
-Full financial responsability will be passed to wife instead, I only have to worry about paying my
-bills on time and ensure that I'm not going into debt (Income vs expense).
+---
 
-### TODO
+## Naming  
+The name combines:  
+1. **"Coin"** - Explicit financial focus (transactions over tasks)  
+2. **"Master"** - From *A Song of Ice and Fire*'s "Master of Coin" role  
+3. **"TaskWarrior"** - Direct inspiration for the CLI paradigm  
 
-**NEXT**: configure cfg/.taskrc
+## Current State
 
-- [x] add `--help` option
-- [x] add style to help.txt
-- [x] list bills
-- [x] executing task
-- [ ] ready .taskrc
-- [ ] import data from old coin.db
-- [ ] must be able to send/create email reminders (create email file to pipe/send to sendmail)
-- [ ] must be able to export tasks
-- [ ] must be able to export reminders (REM syntax)
-- [ ] must be able to answer the questions such as: 'am I going into debt?' or 'can I afford it this week?'
+CoinMaster is a minimal interface for financial tracking via TaskWarrior:
 
-##
+  - Data Model: Directly mirrors TaskWarrior's JSON schema for compatibility
+  - Interaction: Crude form-based wrapper around task import for transaction entry
+  - Basic CRUD operations (no advanced validation or workflows)
+  - No financial logic (balances, reports, or analytics)
+
+This serves strictly as a proof-of-concept for TaskWarrior-as-a-ledger 

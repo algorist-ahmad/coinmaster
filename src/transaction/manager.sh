@@ -65,9 +65,14 @@ add_interactively() {
 
 # give useful feedback upon successful save
 insert_transaction() {
-  echo "$data" | task import ; c=$?
+  data="$@"
+  feedback=$(mktemp /tmp/coinmaster/new-transactions/feedback.XXX)
+  echo "$data" | task import > $feedback ; c=$?
   if ok $c
-    then task newest limit:1
+    then
+      echo "OPERATIONS:"
+      tail -n +2 $feedback
+      task newest limit:1
     else >&2 echo "ERROR some shit went wrong"
   fi
   return $c
