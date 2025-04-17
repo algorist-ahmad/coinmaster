@@ -4,7 +4,7 @@
 
 # TESTS: FAIL
 
-ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
+ROOT=$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")" )" )
 
 source "$ROOT/src/load-config.sh"
 
@@ -27,6 +27,17 @@ main() {
     update | set | -u) update_balance "$@" ;;
     move | mv )        move_amount "$@" ;;
   esac
+}
+
+display_help() {
+  echo "
+  coin account
+
+  help
+  query
+  edit
+  set [account name] [balance]
+  mv [amount] [from account] [to account]"
 }
 
 query_balances() {
@@ -130,17 +141,6 @@ move_amount() {
   ' "$BALANCE_FILE"
 
   echo "Success: Moved $amount from $source to $dest at $current_time"
-}
-
-display_help() {
-  echo "
-  coin balance ...
-
-  help
-  query
-  set [account name] [balance]
-  edit
-  mv [amount] [from account] [to account]"
 }
 
 validate_file() {

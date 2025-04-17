@@ -5,30 +5,27 @@
   \e[32mcoin\e[0m \e[32m[SUBCOMMAND]\e[0m \e[33m[OPTIONS]\e[0m \e[36m[ARGS]\e[0m  # Native-style
 
 \e[1mNATIVE SUBCOMMANDS\e[0m
-  \e[32m \e[0m         Show a combination of reports: current balance, bills, etc.
-  \e[32mhelp\e[0m      Show this message
+  \e[32m \e[0m         [UPDATE REQUIRED] Show upcoming bills followed by total balance
+  \e[32mhelp\e[0m      Show this message. Tip: `help` is context-sensitive.
   \e[32mversion\e[0m   Print version number
-  \e[32mbills\e[0m     Query or update bills (bill-manager)
-  \e[32mbalance\e[0m   Query or update balance (account-manager)
-  \e[32mplan\e[0m      Query or update payment distribution plans (pdp-manager)
-  \e[32mnew\e[0m       Create a new object: a bill, a plan, a contract, ... NOT IMPLEMENTED
-  \e[32mlist\e[0m      Show upcoming bills (default) DEPRECATED
-  \e[32madd\e[0m       Creates a new bill (Next update: Alias to `bills add`)
-  \e[32mpay\e[0m       Alias to `bills pay` NOT IMPLEMENTED
+  \e[32maccount\e[0m   Query or update accounts (alias: acc, balance)
+  \e[32mtransaction\e[0m   [ISSUE #14] [DEFAULT] Query or update transactions (aliases: txn, balance)
+  \e[32mplan\e[0m      [ISSUE ?] Query or update payment distribution plans (pdp-manager)
+
+\e[1mSHORTCUTS\e[0m
+  \e[32mbills\e[0m     Query or update bills [coin txn +bills]
+  \e[32madd\e[0m       Creates a new transaction [coin txn add]
+  \e[32mpay\e[0m       [ISSUE #9] Updates a transaction paid amount. [coin txn pay]
+  \e[32mnew\e[0m       [ISSUE #15] Create a new object: txn, bill, plan, contract, ...
+  \e[32mlist\e[0m      [DEPRECATED] Show upcoming bills (default)
 
 \e[1mTASKWARRIOR COMMANDS\e[0m
-  \e[35mmodify\e[0m    Edit existing bill
-  \e[35mexport\e[0m    Generate bill reports
+  \e[35mmodify\e[0m    Edit existing transaction
+  \e[35mexport\e[0m    Generate a transaction report
   \e[35mstats\e[0m     Financial overview
   \e[35mundo\e[0m      Reverse last action
 
-\e[1mOPTIONS\e[0m NOT IMPLEMENTED
-  \e[33m--currency\e[0m=CURR   Set display currency
-  \e[33m--template\e[0m=NAME  Use bill template
-  \e[33m-v, --verbose\e[0m    Show payment details
-  \e[33m-q, --quiet\e[0m      Minimal output
-
-\e[1mEXAMPLES\e[0m
+\e[1mEXAMPLES (update required)\e[0m
   \e[36m# Default bill listing\e[0m
   \e[32mcoin\e[0m
 

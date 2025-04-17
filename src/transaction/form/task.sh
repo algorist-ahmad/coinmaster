@@ -1,14 +1,9 @@
 #!/bin/bash
 
-# Execute task commands as they areon behalf of coinmaster
+# Execute task commands as they are on behalf of coinmaster
 
-# TESTS: FAIL
-
-# FIXME:
-
-# TODO:
-# [ ] load and override variables TASKDATA and TASKRC
-# [ ] 
+# STATUS: FLAGGED FOR REMOVAL
+# TESTS:  FAIL
 
 ROOT=$( dirname "$(dirname "$(readlink -f "$0")")" )
 
@@ -16,8 +11,8 @@ source "$ROOT/src/load-config.sh"
 
 ARGS="$@"
 CONFIGFILE="$ROOT/config.yml"
-TASKDATA="$COINDATA/tasks"
 TASKRC="$ROOT/cfg/.taskrc"
+TASKDATA="$COINDATA/txn"
 
 main() {
   load_config
