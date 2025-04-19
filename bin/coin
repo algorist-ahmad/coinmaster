@@ -9,6 +9,9 @@ VERSION='0.2.0'
 # TESTS:  PASSED but undocumented
 
 ROOT_DIR=$( dirname "$(dirname "$(readlink -f "$0")")" )
+
+source "$ROOT_DIR/src/dependency/manager.sh"
+
 CONFIGFILE="$ROOT_DIR/config.yml"
 HELPFILE="$ROOT_DIR/help.txt"
 ARGS="$@"
@@ -34,6 +37,7 @@ CMD_BALANCE="$ROOT_DIR/src/balance.sh" # FLAGGED FOR REMOVAL
 DEFAULT_FN='undefined_function'  # Defined in config
 
 main() {
+  check_dependencies_warn
   load_config_file
   dispatch $ARGS   # notice: no quotes, something changed here!
 }
@@ -106,7 +110,11 @@ show_version() { echo -e "coin $VERSION" ; }
 
 # txn, bill, plan, contract
 create_new_object() {
-  object_to_create=$(gum choose --header="New what?" --cursor="> new " --label-delimiter=":" "${COIN_OBJECTS[@]}")
+
+  if command -v gum
+    then object_to_create=$(gum choose --header="New what?" --cursor="> new " --label-delimiter=":" "${COIN_OBJECTS[@]}")
+    else cmd_not_found_exception
+  fi
 
   case "$object_to_create" in
     txn) do_transac add  "$@" ;;
@@ -114,6 +122,10 @@ create_new_object() {
     plan) echo "Not implemented, create an issue with \`gh issue create\`"  ;;
     contract) echo "Not implemented, create an issue with \`gh issue create\`"  ;;
   esac 
+}
+
+cmd_not_found_exception() {
+  >&2 echo -e "Command \`gum\` required, do: sudo pacman -S gum"
 }
 
 main

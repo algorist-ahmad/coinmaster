@@ -10,6 +10,7 @@ ROOT=$( dirname "$( dirname "$( dirname "$(dirname "$(readlink -f "$0")")")")")
 
 source $ROOT/src/utils/json.sh
 source $ROOT/src/utils/test.sh
+source $ROOT/src/dependency/manager.sh
 
 ARGS="$@"
 TMPDIR='/tmp/coinmaster'
@@ -40,6 +41,7 @@ JQ_QUERY_INSERT='
 trap handle_interrupt SIGINT
 
 main() {
+  if ! check_dependencies_exit; then >&2 echo "RETURNING 3" ; exit 3 ; fi
   initialize # CRITICAL
   initialize_form_metadata $OUTPUT_FILE
   collect_user_input $OUTPUT_FILE
