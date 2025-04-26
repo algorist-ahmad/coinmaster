@@ -1,5 +1,7 @@
 #/bin/bash
 
+# DEPRECATED
+
 load_config() {
   # >&2 echo "loading..."
   :

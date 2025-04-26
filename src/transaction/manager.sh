@@ -28,8 +28,9 @@ dispatch() {
   case "$1" in
     help | --help | -h)   shift ; show_help ;;
     bill* | --bill | -b)  shift ; list_bills +bill "$@" ;; # ISSUE ??
-    add | new)            shift ; add_txn $@  ;;      # ISSUE 14
+    add | new)            shift ; add_txn $@  ;;        # ISSUE 14
     log | -aa)            shift ; log_txn "$@"  ;;      # ISSUE ??
+    export)               shift ; export_pending_txn ;; # ISSUE 34
 
     *) task "$@" ;;
   esac
@@ -133,6 +134,29 @@ extract_data() {
   data="[$data]"
   # send
   echo "$data"
+}
+
+# exports pending transactions due within 2weeks
+export_pending_txn() {
+  set -x
+  task status:pending due.before:2weeks export > /tmp/coin.export.json
+  tag_txn /tmp/coin.export.json 'COIN'
+}
+
+# add special tag COIN when exporting
+tag_txn() {
+  set -u
+  jsonfile="$1"
+  newtag="$2"
+  jq --arg newtag "$newtag" 'map(.tags |= . + [$newtag])' "$jsonfile"
+}
+
+# remove special tag COIN when importing
+untag_txn() {
+  set -u
+  jsonfile="$1"
+  tag="$2"
+  jq --arg tag "$tag" 'map(.tags |= . - [$tag])' "$jsonfile"
 }
 
 main
