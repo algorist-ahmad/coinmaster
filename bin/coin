@@ -49,6 +49,39 @@ main() {
   check_dependencies_warn
   load_config_file
   dispatch $ARGS   # notice: no quotes, something changed here!
+  print_last_updated
+}
+
+# FIXME
+print_last_updated() {
+  local timestamp=$(yq .last_updated "$HOME/collections/coin/meta.yml")
+  local current_time=$(date +%s)
+  local updated_time=$(date -d "$timestamp" +%s)
+  local diff=$((current_time - updated_time))
+  
+  # ANSI style codes
+  local bold="\033[1m"
+  local cyan="\033[38;5;51m"
+  local magenta="\033[38;5;201m"
+  local yellow="\033[38;5;226m"
+  local reset="\033[0m"
+
+  # Calculate relative time
+  local relative_time
+  if (( diff < 60 )); then
+    relative_time="${diff} seconds ago"
+  elif (( diff < 3600 )); then
+    relative_time="$((diff / 60)) minutes ago"
+  elif (( diff < 86400 )); then
+    relative_time="$((diff / 3600)) hours ago"
+  else
+    relative_time="$((diff / 86400)) days ago"
+  fi
+
+  # Format output with styles
+  echo -e "\n${bold}${cyan}Last updated:${reset}" \
+    "${magenta}$(date -d "$timestamp" '+%Y-%m-%d %H:%M:%S')" \
+    "${yellow}(${relative_time})${reset}"
 }
 
 # load config from config.yml
