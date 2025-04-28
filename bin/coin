@@ -99,6 +99,7 @@ dispatch() {
       new) shift ; create_new_object "$@" ;;
     --dev) shift ; echo "DEV MODE: shortcut to gh and git to aid in development" ;;
     export) shift ; do_transac export ;;
+    vd)     launch_visidata ;;
 
     # managers
     acc* | --account* | -A | bal*) shift ; do_account "$@" ;;
@@ -120,6 +121,17 @@ dispatch() {
     * ) do_transac "$ARGS" ;;
     
   esac
+}
+
+launch_visidata() {
+  if ! command -v vd >/dev/null; then
+    >&2 echo "You need to have Visidata installed to use this command."
+    if ! command -v gum; then sudo pacman -S gum; fi
+    if gum confirm "Install vd?"; then sudo pacman -S vd; fi
+  fi
+  [[ -z "$COINDATA" ]] && >&2 echo "variable \$COINDATA not defined" && exit 11
+  [[ ! -d "$COINDATA" ]] && >&2 echo "dir $COINDATA does not exists" && exit 12
+  vd "$COINDATA"
 }
 
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
