@@ -52,6 +52,11 @@ main() {
   print_last_updated
 }
 
+initialize_coin() {
+  [[ ! -d "$COINMASTER" ]] && >&2 echo "Export \$COINMASTER to match existing directory" && exit 14
+  create-all-the-directories
+}
+
 # FIXME
 print_last_updated() {
   local timestamp=$(yq .last_updated "$HOME/collections/coin/meta.yml")
@@ -131,7 +136,8 @@ launch_visidata() {
   fi
   [[ -z "$COINDATA" ]] && >&2 echo "variable \$COINDATA not defined" && exit 11
   [[ ! -d "$COINDATA" ]] && >&2 echo "dir $COINDATA does not exists" && exit 12
-  vd "$COINDATA"
+  [[ ! -f "$COINDATA/meta.yml" ]] && >&2 echo "meta.yml not found in $COINDATA, initiallizing dir" && initialize_coin
+  vd "$COINDATA/txn/csv"
 }
 
 config_get() { echo $(yq ".$*" "$CONFIGFILE") ; }
