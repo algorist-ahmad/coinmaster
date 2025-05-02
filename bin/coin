@@ -23,6 +23,7 @@ source "$ROOT/src/dependency/manager.sh"
 
 CONFIGFILE="$ROOT/config.yml"
 HELPFILE="$ROOT/help.txt"
+METAFILE="$COINDATA/meta.yml"
 ARGS="$@"
 
 # Define options as an array to preserve spaces
@@ -59,7 +60,7 @@ initialize_coin() {
 
 # FIXME
 print_last_updated() {
-  local timestamp=$(yq .last_updated "$HOME/collections/coin/meta.yml")
+  local timestamp=$(yq .last_updated "$METAFILE")
   local current_time=$(date +%s)
   local updated_time=$(date -d "$timestamp" +%s)
   local diff=$((current_time - updated_time))
@@ -105,6 +106,7 @@ dispatch() {
     --dev) shift ; echo "DEV MODE: shortcut to gh and git to aid in development" ;;
     export) shift ; do_transac export ;;
     vd)     launch_visidata ;;
+    --update-time) update_timestamp ;;
 
     # managers
     acc* | --account* | -A | bal*) shift ; do_account "$@" ;;
@@ -126,6 +128,12 @@ dispatch() {
     * ) do_transac "$ARGS" ;;
     
   esac
+}
+
+update_timestamp() {
+  set -eo pipefail
+  now=$(date +'%Y-%m-%dT%H:%M:%S')
+  yq -i ".last_updated = \"$now\"" "$METAFILE"
 }
 
 launch_visidata() {
