@@ -40,19 +40,88 @@ display_help() {
   mv [amount] [from account] [to account]"
 }
 
+# shitty code by Deepseek, FIXME
 query_balances() {
-  validate_file "$BALANCES_FILE"
+  set -euo pipefail
 
-  # Get all balances as a list, sum them with bc
-  local total_balance
-  total_balance=$(yq -r '.[].balance' "$BALANCE_FILE" | paste -sd+ | bc)
+  validate_file "$BALANCE_FILE"
 
-  # Generate table with total
-  (
-    echo "Account Balance Updated"
-    yq -r '.[] | [.name, .balance, .updated] | join(" ")' "$BALANCE_FILE"
-    printf "\e[31mTotal\e[0m %s \n" "$total_balance"
-  ) | column -t
+  # Color and formatting definitions
+  COLOR_RED="\033[31m"
+  COLOR_GREEN="\033[32m"
+  COLOR_YELLOW="\033[33m"
+  COLOR_RESET="\033[0m"
+  BOLD="\033[1m"
+
+  # Color code balance values
+  colorize_balance() {
+    local balance="$1"
+    if (( $(echo "$balance < 0" | bc -l) )); then
+      printf "%b%'12.2f%b" "$COLOR_RED" "$balance" "$COLOR_RESET"
+    elif (( $(echo "$balance == 0" | bc -l) )); then
+      printf "%b%'12.2f%b" "$COLOR_RESET" "$balance" "$COLOR_RESET"
+    else
+      printf "%b%'12.2f%b" "$COLOR_GREEN" "$balance" "$COLOR_RESET"
+    fi
+  }
+
+  # Calculate colored relative time
+  get_colored_relative_time() {
+    local timestamp="$1"
+    local current_time=$(date +%s)
+    local updated_time=$(date -d "$timestamp" +%s 2>/dev/null || echo 0)
+    local diff=$((current_time - updated_time))
+    local seconds_per_day=86400
+
+    if (( diff < seconds_per_day )); then
+      color="$COLOR_GREEN"
+      if (( diff < 60 )); then
+        time_str=$(printf "%2ds ago" "$diff")
+      elif (( diff < 3600 )); then
+        time_str=$(printf "%2dm ago" "$((diff / 60))")
+      else
+        time_str=$(printf "%2dh ago" "$((diff / 3600))")
+      fi
+    elif (( diff < 3 * seconds_per_day )); then
+      color="$COLOR_YELLOW"
+      time_str=$(printf "%2dd ago" "$((diff / seconds_per_day))")
+    else
+      color="$COLOR_RED"
+      time_str=$(printf "%2dd ago" "$((diff / seconds_per_day))")
+    fi
+
+    printf "%b%-8s%b" "$color" "$time_str" "$COLOR_RESET"
+  }
+
+  # Generate the formatted table
+  generate_formatted_table() {
+    # Header (swapped columns)
+    printf "%b%-12s %12s %-8s %-19s%b\n" \
+      "$BOLD" "Account" "Balance" "Relative" "Updated" "$COLOR_RESET"
+
+    # Data rows with swapped columns
+    yq -r '.[] | [.name, .balance, .updated] | join(" ")' "$BALANCE_FILE" | \
+      while read -r name balance updated; do
+        printf "%-12s %b %b %-19s\n" \
+          "$name" \
+          "$(colorize_balance "$balance")" \
+          "$(get_colored_relative_time "$updated")" \
+          "$(date -d "$updated" "+%Y-%m-%d %H:%M:%S")"
+      done
+  }
+
+  # Calculate and display total
+  display_total() {
+    local total_balance=$(yq -r '.[].balance' "$BALANCE_FILE" | paste -sd+ - | bc)
+    printf "\n%b%-12s %b%'12.2f%b\n" \
+      "$BOLD" "TOTAL" \
+      "$COLOR_RESET" "$total_balance" \
+      "$COLOR_RESET"
+  }
+
+  # Display the table
+  generate_formatted_table | column -t -s $'\t'
+  display_total
 }
 
 edit_accounts_file() {
@@ -61,7 +130,7 @@ edit_accounts_file() {
 
 update_balance() {
 
-  set -x
+  # set -x
 
   # Ensure correct arguments
   if [ $# -lt 3 ]; then
@@ -86,7 +155,7 @@ update_balance() {
   fi
 
   # Update balance and timestamp
-  current_time=$(date -u +"%Y-%m-%dT%H%M%SZ")
+  current_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   yq eval ".[] |= select(.name == \"$account\") |= ( .balance = $amount | .updated = \"$current_time\" )" "$BALANCE_FILE" > "$tmp_file" && mv "$tmp_file" "$BALANCE_FILE"
 
   echo "Success: Updated $account balance to $amount at $current_time"
