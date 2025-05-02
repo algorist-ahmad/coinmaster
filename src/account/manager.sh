@@ -60,6 +60,9 @@ edit_accounts_file() {
 }
 
 update_balance() {
+
+  set -x
+
   # Ensure correct arguments
   if [ $# -lt 3 ]; then
     echo "Error: Usage: balance.sh set <account> <amount>"
@@ -71,8 +74,8 @@ update_balance() {
   local tmp_file=$(mktemp)
 
   # Validate numerical amount
-  if ! [[ "$amount" =~ ^[0-9]+$ ]]; then
-    echo "Error: Amount must be a positive integer"
+  if ! [[ "$amount" =~ ^-?[0-9]+(\.[0-9]+)?$ ]]; then
+    echo "Error: Amount must be a numeric value"
     exit 1
   fi
 
