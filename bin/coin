@@ -117,6 +117,7 @@ dispatch() {
     add   | --add  | -a)  shift ; do_transac add  "$@"   ;; # untested
     bill* | --bill | -b)  shift ; do_transac bill "$@"   ;; # untested
     log   | --log  | -aa) shift ; do_transac log  "$@"   ;; # not implemented
+    git   | --git)        shift ; git -C "$COINDATA" "$@" ;;
 
     # unimplemented
     --generate-*mail)       shift ; do_generate_email "$@"    ;; # undocumented TODO
