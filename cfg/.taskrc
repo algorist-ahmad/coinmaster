@@ -8,6 +8,9 @@ include dark-256.theme
 
 # GENERAL SETTINGS *********************************************************************************
 
+  # recent
+  color.status.deleted=gray
+  
   # editor summoned when doing `task edit`
     editor=$EDITOR
   # DO NOT PROPAGATE CHANGES TO OTHER CHILDREN
