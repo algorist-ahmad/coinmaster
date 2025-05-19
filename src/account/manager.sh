@@ -96,17 +96,18 @@ query_balances() {
   # Generate the formatted table
   generate_formatted_table() {
     # Header (swapped columns)
-    printf "%b%-12s %12s %-8s %-19s%b\n" \
-      "$BOLD" "Account" "Balance" "Relative" "Updated" "$COLOR_RESET"
+    printf "%b%-12s %12s %-8s %-19s %-20s%b\n" \
+      "$BOLD" "Account" "Balance" "Relative" "Updated" "Note" "$COLOR_RESET"
 
     # Data rows with swapped columns
-    yq -r '.[] | [.name, .balance, .updated] | join(" ")' "$BALANCE_FILE" | \
-      while read -r name balance updated; do
-        printf "%-12s %b %b %-19s\n" \
+    yq -r '.[] | [.name, .balance, .updated, .note] | join(" ")' "$BALANCE_FILE" | \
+      while read -r name balance updated note; do
+        printf "%-12s %b %b %-19s %-20s\n" \
           "$name" \
           "$(colorize_balance "$balance")" \
           "$(get_colored_relative_time "$updated")" \
-          "$(date -d "$updated" "+%Y-%m-%d %H:%M:%S")"
+          "$(date -d "$updated" "+%Y-%m-%d %H:%M:%S")"\
+          "$note"
       done
   }
 

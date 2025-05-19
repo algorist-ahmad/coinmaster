@@ -38,7 +38,7 @@ query_balances() {
   # Generate table with total
   (
     echo "Account Balance Updated"
-    yq -r '.[] | [.name, .balance, .updated] | join(" ")' "$BALANCE_FILE"
+    yq -r '.[] | [.name, .balance, .updated, .note] | join(" ")' "$BALANCE_FILE"
     printf "\e[31mTotal\e[0m %s \n" "$total_balance"
   ) | column -t
 }
